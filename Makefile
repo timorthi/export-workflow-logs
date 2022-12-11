@@ -1,6 +1,6 @@
 .PHONY: test
 test:
-	@echo "Test placeholder"
+	go test -v
 
 .PHONY: build
 build:
