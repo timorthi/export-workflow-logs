@@ -1,19 +1,15 @@
 # https://www.sethvargo.com/writing-github-actions-in-go/
-# Specify the version of Go to use
 FROM golang:1.19 AS builder
 
-# Install upx (upx.github.io) to compress the compiled action
+# Install upx to compress the binary
 RUN apt-get update && apt-get -y install upx
 
-# Disable CGO
 ENV CGO_ENABLED=0
 
-# Copy all the files from the host into the container
 WORKDIR /src/export-workflow-logs
 COPY . .
 
-# Compile the action - the added flags instruct Go to produce a
-# standalone binary
+# Compile the action - the added flags instruct Go to produce a standalone binary
 RUN go build \
   -a \
   -trimpath \
@@ -23,17 +19,11 @@ RUN go build \
   -o /bin/action \
   .
 
-# Strip any symbols - this is not a library
+# Strip any symbols (this is not a library) then compress the action
 RUN strip /bin/action
-
-# Compress the compiled action
 RUN upx -q -9 /bin/action
 
 
-# Step 2
-
-# Use the most basic and empty container - this container has no
-# runtime, files, shell, libraries, etc.
 FROM scratch
 
 # Copy over SSL certificates from the first step - this is required
