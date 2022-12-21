@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -58,7 +57,7 @@ func main() {
 
 	downloadFileByURL(url.String())
 
-	files, err := ioutil.ReadDir(GetRequiredEnv(envVarRunnerTempDir))
+	files, err := os.ReadDir(GetRequiredEnv(envVarRunnerTempDir))
 	if err != nil {
 		log.Fatal(err)
 	}
