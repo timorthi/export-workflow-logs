@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"os"
 	"path"
-	"strconv"
 	"strings"
 )
 
@@ -49,12 +48,6 @@ func main() {
 	log.Println("Hello world!")
 	client := GithubClient()
 
-	runIDString := GetRequiredEnv(envVarWorkflowRunID)
-	runID, parseErr := strconv.ParseInt(runIDString, 10, 64)
-	if parseErr != nil {
-		log.Fatalf("Could not convert runID '%s' to int64", runIDString)
-	}
-
 	repoOwner := GetRequiredEnv(envVarRepoOwner)
 	repoName := strings.Split(GetRequiredEnv(envVarRepoFullName), "/")[1]
 
@@ -70,7 +63,7 @@ func main() {
 		context.Background(),
 		repoOwner,
 		repoName,
-		runID,
+		inputWorkflowRunID,
 		true,
 	)
 
