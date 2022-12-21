@@ -5,9 +5,13 @@ inputs:
   repo-token:
     description: "GitHub API token to make requests with."
     required: true
+  run-id:
+    description: "The workflow run ID to export logs for"
+    required: true
 
 runs:
   using: "docker"
   image: "Dockerfile"
   args:
     - ${{ inputs.repo-token }}
+    - ${{ inputs.run-id }}
