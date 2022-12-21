@@ -50,10 +50,15 @@ func main() {
 		log.Fatalf("Could not convert runID '%s' to int64", runIDString)
 	}
 
+	repoOwner := GetRequiredEnv(envVarRepoOwner)
+	repoName := strings.Split(GetRequiredEnv(envVarRepoFullName), "/")[1]
+
+	log.Printf("repoOwner:%s\nrunID:%d\nrepoName:%s\n", repoOwner, runID, repoName)
+
 	url, response, getLogsErr := client.Actions.GetWorkflowRunLogs(
 		context.Background(),
-		GetRequiredEnv(envVarRepoOwner),
-		strings.Split(GetRequiredEnv(envVarRepoFullName), "/")[1],
+		repoOwner,
+		repoName,
 		runID,
 		true,
 	)
