@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path"
 	"strconv"
 	"strings"
 )
@@ -19,8 +20,14 @@ func downloadFileByURL(url string) error {
 	}
 	defer resp.Body.Close()
 
+	tmpDir, err := os.MkdirTemp(GetRequiredEnv(envVarGitHubWorkspace), "tmp")
+	if err != nil {
+		return err
+	}
+	defer os.RemoveAll(tmpDir)
+
 	// Create the file
-	tempFilePath := fmt.Sprintf("%s/tmp/logs.zip", GetRequiredEnv(envVarGitHubWorkspace))
+	tempFilePath := path.Join(tmpDir, "logs.zip")
 	log.Printf("Using path: %s", tempFilePath)
 	out, err := os.Create(tempFilePath)
 	if err != nil {
