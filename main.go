@@ -41,6 +41,7 @@ func downloadFileByURL(url string) error {
 }
 
 func main() {
+	fmt.Println(os.Args)
 	log.Println("Hello world!")
 	client := GithubClient()
 
