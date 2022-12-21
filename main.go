@@ -24,10 +24,9 @@ func downloadFileByURL(url string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	defer os.RemoveAll(tmpDir)
 
 	// Create the file
-	tempFilePath := path.Join(tmpDir, "logs.zip")
+	tempFilePath := path.Join(tmpDir, tempFileName)
 	log.Printf("Using path: %s", tempFilePath)
 	out, err := os.Create(tempFilePath)
 	if err != nil {
@@ -38,6 +37,7 @@ func downloadFileByURL(url string) (string, error) {
 	// Write the body to file
 	_, err = io.Copy(out, resp.Body)
 	if err != nil {
+		os.RemoveAll(tmpDir)
 		return "", err
 	}
 
