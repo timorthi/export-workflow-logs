@@ -12,17 +12,17 @@ import (
 	"strings"
 )
 
-func downloadFileByURL(url string) error {
+func downloadFileByURL(url string) (string, error) {
 	// Get the data
 	resp, err := http.Get(url)
 	if err != nil {
-		return err
+		return "", err
 	}
 	defer resp.Body.Close()
 
 	tmpDir, err := os.MkdirTemp(GetRequiredEnv(envVarGitHubWorkspace), "tmp")
 	if err != nil {
-		return err
+		return "", err
 	}
 	defer os.RemoveAll(tmpDir)
 
@@ -31,13 +31,17 @@ func downloadFileByURL(url string) error {
 	log.Printf("Using path: %s", tempFilePath)
 	out, err := os.Create(tempFilePath)
 	if err != nil {
-		return err
+		return "", err
 	}
 	defer out.Close()
 
 	// Write the body to file
 	_, err = io.Copy(out, resp.Body)
-	return err
+	if err != nil {
+		return "", err
+	}
+
+	return tempFilePath, nil
 }
 
 func main() {
@@ -71,17 +75,10 @@ func main() {
 	log.Println(url)
 	log.Println(response)
 
-	fileDownloadErr := downloadFileByURL(url.String())
+	pathToFile, fileDownloadErr := downloadFileByURL(url.String())
 	if fileDownloadErr != nil {
 		log.Fatal(fileDownloadErr)
 	}
 
-	files, err := os.ReadDir(fmt.Sprintf("%s/tmp", GetRequiredEnv(envVarGitHubWorkspace)))
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	for _, file := range files {
-		fmt.Println(file.Name(), file.IsDir())
-	}
+	log.Printf("Path to file is: %s", pathToFile)
 }
