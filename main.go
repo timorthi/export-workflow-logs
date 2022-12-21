@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
-	"os/exec"
 	"strconv"
 	"strings"
 )
@@ -58,9 +58,12 @@ func main() {
 
 	downloadFileByURL(url.String())
 
-	output, err := exec.Command("ls", "-alh", GetRequiredEnv(envVarRunnerTempDir)).Output()
+	files, err := ioutil.ReadDir(GetRequiredEnv(envVarRunnerTempDir))
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(string(output))
+
+	for _, file := range files {
+		fmt.Println(file.Name(), file.IsDir())
+	}
 }
