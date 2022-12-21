@@ -60,7 +60,13 @@ func main() {
 
 	log.Printf("repoOwner:%s\nrunID:%d\nrepoName:%s\n", repoOwner, runID, repoName)
 
-	url, response, getLogsErr := client.Actions.GetWorkflowRunLogs(
+	workflow, _, err := client.Actions.GetWorkflowRunByID(context.Background(), repoOwner, repoName, runID)
+	log.Println(workflow)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	url, _, getLogsErr := client.Actions.GetWorkflowRunLogs(
 		context.Background(),
 		repoOwner,
 		repoName,
@@ -73,7 +79,6 @@ func main() {
 	}
 
 	log.Println(url)
-	log.Println(response)
 
 	pathToFile, fileDownloadErr := downloadFileByURL(url.String())
 	if fileDownloadErr != nil {
