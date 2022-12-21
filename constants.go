@@ -5,4 +5,5 @@ const (
 	envVarRepoOwner     string = "GITHUB_REPOSITORY_OWNER"
 	envVarRepoFullName  string = "GITHUB_REPOSITORY"
 	envVarWorkflowRunID string = "GITHUB_RUN_ID"
+	envVarRunnerTempDir string = "RUNNER_TEMP"
 )
