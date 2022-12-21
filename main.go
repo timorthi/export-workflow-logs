@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"io"
 	"log"
@@ -44,13 +45,14 @@ func downloadFileByURL(url string) (string, error) {
 }
 
 func main() {
+	flag.Parse()
 	fmt.Println(os.Args)
-	log.Println("Hello world!")
 	client := GithubClient()
 
 	repoOwner := GetRequiredEnv(envVarRepoOwner)
 	repoName := strings.Split(GetRequiredEnv(envVarRepoFullName), "/")[1]
 
+	inputWorkflowRunID := *inputWorkflowRunIDPtr
 	log.Printf("repoOwner:%s\nrunID:%d\nrepoName:%s\n", repoOwner, inputWorkflowRunID, repoName)
 
 	workflow, _, err := client.Actions.GetWorkflowRunByID(context.Background(), repoOwner, repoName, inputWorkflowRunID)

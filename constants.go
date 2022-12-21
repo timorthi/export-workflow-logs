@@ -12,6 +12,6 @@ const (
 )
 
 var (
-	inputRepoToken     string = *flag.String("repo-token", "", "GITHUB_TOKEN or a Personal Access Token")
-	inputWorkflowRunID int64  = *flag.Int64("run-id", 0, "GitHub Actions Workflow Run ID")
+	inputRepoTokenPtr     *string = flag.String("repo-token", "", "GITHUB_TOKEN or a Personal Access Token")
+	inputWorkflowRunIDPtr *int64  = flag.Int64("run-id", 0, "GitHub Actions Workflow Run ID")
 )
