@@ -43,7 +43,7 @@ func main() {
 		log.Fatalf("Could not convert runID '%s' to int64", runIDString)
 	}
 
-	url, response, err := client.Actions.GetWorkflowRunLogs(
+	url, response, getLogsErr := client.Actions.GetWorkflowRunLogs(
 		context.Background(),
 		GetRequiredEnv(envVarRepoOwner),
 		strings.Split(GetRequiredEnv(envVarRepoFullName), "/")[1],
@@ -51,9 +51,12 @@ func main() {
 		true,
 	)
 
+	if getLogsErr != nil {
+		log.Fatal(getLogsErr)
+	}
+
 	log.Println(url)
 	log.Println(response)
-	log.Println(err)
 
 	fileDownloadErr := downloadFileByURL(url.String())
 	if fileDownloadErr != nil {
