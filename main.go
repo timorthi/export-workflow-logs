@@ -51,9 +51,9 @@ func main() {
 	repoOwner := GetRequiredEnv(envVarRepoOwner)
 	repoName := strings.Split(GetRequiredEnv(envVarRepoFullName), "/")[1]
 
-	log.Printf("repoOwner:%s\nrunID:%d\nrepoName:%s\n", repoOwner, runID, repoName)
+	log.Printf("repoOwner:%s\nrunID:%d\nrepoName:%s\n", repoOwner, inputWorkflowRunID, repoName)
 
-	workflow, _, err := client.Actions.GetWorkflowRunByID(context.Background(), repoOwner, repoName, runID)
+	workflow, _, err := client.Actions.GetWorkflowRunByID(context.Background(), repoOwner, repoName, inputWorkflowRunID)
 	log.Println(workflow)
 	if err != nil {
 		log.Fatal(err)
