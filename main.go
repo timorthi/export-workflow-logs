@@ -20,7 +20,7 @@ func downloadFileByURL(url string) error {
 	defer resp.Body.Close()
 
 	// Create the file
-	tempFilePath := fmt.Sprintf("%s/logs.zip", GetRequiredEnv(envVarRunnerTempDir))
+	tempFilePath := fmt.Sprintf("%s/tmp/logs.zip", GetRequiredEnv(envVarGitHubWorkspace))
 	log.Printf("Using path: %s", tempFilePath)
 	out, err := os.Create(tempFilePath)
 	if err != nil {
@@ -55,9 +55,12 @@ func main() {
 	log.Println(response)
 	log.Println(err)
 
-	downloadFileByURL(url.String())
+	fileDownloadErr := downloadFileByURL(url.String())
+	if fileDownloadErr != nil {
+		log.Fatal(fileDownloadErr)
+	}
 
-	files, err := os.ReadDir(GetRequiredEnv(envVarRunnerTempDir))
+	files, err := os.ReadDir(fmt.Sprintf("%s/tmp", GetRequiredEnv(envVarGitHubWorkspace)))
 	if err != nil {
 		log.Fatal(err)
 	}
