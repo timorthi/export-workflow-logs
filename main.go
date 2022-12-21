@@ -79,6 +79,7 @@ func main() {
 	if fileDownloadErr != nil {
 		log.Fatal(fileDownloadErr)
 	}
+	defer os.RemoveAll(path.Dir(pathToFile))
 
 	log.Printf("Path to file is: %s", pathToFile)
 }
