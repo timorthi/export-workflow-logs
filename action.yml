@@ -13,5 +13,5 @@ runs:
   using: "docker"
   image: "Dockerfile"
   args:
-    - --repo-token="${{ inputs.repo-token }}"
+    - --repo-token=${{ inputs.repo-token }}
     - --run-id=${{ inputs.run-id }}
