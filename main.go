@@ -82,4 +82,16 @@ func main() {
 	defer os.RemoveAll(path.Dir(pathToFile))
 
 	log.Printf("Path to file is: %s", pathToFile)
+
+	if strings.EqualFold(*inputDestination, "s3") {
+		log.Println("Attempting to save workflow logs to S3")
+		s3Client, err := S3Client()
+		if err != nil {
+			log.Fatal(err)
+		}
+		err = SaveToS3(context.Background(), s3Client, *inputS3BucketName, *inputS3Key, pathToFile)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
 }
