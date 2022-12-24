@@ -12,7 +12,7 @@ type S3PutObjectAPI interface {
 	PutObject(ctx context.Context, params *s3.PutObjectInput, optFns ...func(*s3.Options)) (*s3.PutObjectOutput, error)
 }
 
-func S3Client() (*s3.Client, error) {
+func s3Client() (*s3.Client, error) {
 	os.Setenv("AWS_ACCESS_KEY_ID", *inputAWSAccessKeyID)
 	os.Setenv("AWS_SECRET_ACCESS_KEY", *inputAWSSecretAccessKey)
 
@@ -25,7 +25,7 @@ func S3Client() (*s3.Client, error) {
 	return s3Client, nil
 }
 
-func SaveToS3(ctx context.Context, api S3PutObjectAPI, bucket string, key string, pathToLogsFile string) error {
+func saveToS3(ctx context.Context, api S3PutObjectAPI, bucket string, key string, pathToLogsFile string) error {
 	logsFile, err := os.Open(pathToLogsFile)
 	if err != nil {
 		return err

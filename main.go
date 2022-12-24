@@ -20,7 +20,7 @@ func downloadFileByURL(url string) (string, error) {
 	}
 	defer resp.Body.Close()
 
-	tmpDir, err := os.MkdirTemp(GetRequiredEnv(envVarGitHubWorkspace), "tmp")
+	tmpDir, err := os.MkdirTemp(getRequiredEnv(envVarGitHubWorkspace), "tmp")
 	if err != nil {
 		return "", err
 	}
@@ -47,10 +47,10 @@ func downloadFileByURL(url string) (string, error) {
 func main() {
 	flag.Parse()
 	fmt.Println(os.Args)
-	client := GithubClient()
+	client := githubClient()
 
-	repoOwner := GetRequiredEnv(envVarRepoOwner)
-	repoName := strings.Split(GetRequiredEnv(envVarRepoFullName), "/")[1]
+	repoOwner := getRequiredEnv(envVarRepoOwner)
+	repoName := strings.Split(getRequiredEnv(envVarRepoFullName), "/")[1]
 
 	inputWorkflowRunID := *inputWorkflowRunIDPtr
 	log.Printf("repoOwner:%s\nrunID:%d\nrepoName:%s\n", repoOwner, inputWorkflowRunID, repoName)
@@ -85,11 +85,11 @@ func main() {
 
 	if strings.EqualFold(*inputDestination, "s3") {
 		log.Println("Attempting to save workflow logs to S3")
-		s3Client, err := S3Client()
+		s3Client, err := s3Client()
 		if err != nil {
 			log.Fatal(err)
 		}
-		err = SaveToS3(context.Background(), s3Client, *inputS3BucketName, *inputS3Key, pathToFile)
+		err = saveToS3(context.Background(), s3Client, *inputS3BucketName, *inputS3Key, pathToFile)
 		if err != nil {
 			log.Fatal(err)
 		}
