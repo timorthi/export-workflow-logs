@@ -1,14 +1,15 @@
 package main
 
 import (
-	"log"
 	"os"
+
+	"github.com/rs/zerolog/log"
 )
 
 func getRequiredEnv(envVarName string) string {
 	val, exists := os.LookupEnv(envVarName)
 	if !exists {
-		log.Fatalf("GetRequiredEnv: Env var '%s' does not exist", envVarName)
+		log.Fatal().Str("envVarName", envVarName).Msg("Env var does not exist")
 	}
 	return val
 }

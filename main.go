@@ -3,13 +3,15 @@ package main
 import (
 	"context"
 	"flag"
-	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"path"
 	"strings"
+	"time"
+
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 )
 
 func downloadFileByURL(url string) (string, error) {
@@ -27,7 +29,8 @@ func downloadFileByURL(url string) (string, error) {
 
 	// Create the file
 	tempFilePath := path.Join(tmpDir, tempFileName)
-	log.Printf("Using path: %s", tempFilePath)
+	log.Debug().Str("tempFilePath", tempFilePath).Msg("Creating temp file and writing contents to file")
+
 	out, err := os.Create(tempFilePath)
 	if err != nil {
 		return "", err
@@ -45,53 +48,60 @@ func downloadFileByURL(url string) (string, error) {
 }
 
 func main() {
+	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr, TimeFormat: time.RFC3339})
+	if os.Getenv(envVarRunnerDebug) == "1" {
+		zerolog.SetGlobalLevel(zerolog.DebugLevel)
+	} else {
+		zerolog.SetGlobalLevel(zerolog.InfoLevel)
+	}
+
+	log.Debug().Msg("Attempting to parse and validate Action inputs")
 	flag.Parse()
-	fmt.Println(os.Args)
+	log.Info().Msg("Parsed and validated Action inputs")
+
 	client := githubClient()
 
 	repoOwner := getRequiredEnv(envVarRepoOwner)
 	repoName := strings.Split(getRequiredEnv(envVarRepoFullName), "/")[1]
-
 	inputWorkflowRunID := *inputWorkflowRunIDPtr
-	log.Printf("repoOwner:%s\nrunID:%d\nrepoName:%s\n", repoOwner, inputWorkflowRunID, repoName)
+	log.Debug().
+		Str("repoName", repoName).
+		Str("repoOwner", repoOwner).
+		Int64("workflowRunID", inputWorkflowRunID).
+		Msg("Attempting to fetch workflow run logs")
 
-	workflow, _, err := client.Actions.GetWorkflowRunByID(context.Background(), repoOwner, repoName, inputWorkflowRunID)
-	log.Println(workflow)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	url, _, getLogsErr := client.Actions.GetWorkflowRunLogs(
+	url, _, err := client.Actions.GetWorkflowRunLogs(
 		context.Background(),
 		repoOwner,
 		repoName,
 		inputWorkflowRunID,
 		true,
 	)
-
-	if getLogsErr != nil {
-		log.Fatal(getLogsErr)
+	if err != nil {
+		log.Fatal().Err(err)
 	}
 
-	log.Println(url)
-
-	pathToFile, fileDownloadErr := downloadFileByURL(url.String())
-	if fileDownloadErr != nil {
-		log.Fatal(fileDownloadErr)
+	log.Debug().Str("url", url.String()).Msg("Attempting to download workflow run logs by URL")
+	pathToFile, err := downloadFileByURL(url.String())
+	if err != nil {
+		log.Fatal().Err(err)
 	}
 	defer os.RemoveAll(path.Dir(pathToFile))
-
-	log.Printf("Path to file is: %s", pathToFile)
+	log.Info().Int64("workflowRunID", inputWorkflowRunID).Msg("Successfully downloaded workflow run logs")
 
 	if strings.EqualFold(*inputDestination, "s3") {
-		log.Println("Attempting to save workflow logs to S3")
+		log.Debug().Msg("Attempting to upload workflow logs to S3")
 		s3Client, err := s3Client()
 		if err != nil {
-			log.Fatal(err)
+			log.Fatal().Err(err)
 		}
 		err = saveToS3(context.Background(), s3Client, *inputS3BucketName, *inputS3Key, pathToFile)
 		if err != nil {
-			log.Fatal(err)
+			log.Fatal().Err(err)
 		}
+		log.Info().
+			Str("s3BucketName", *inputS3BucketName).
+			Str("s3Key", *inputS3Key).
+			Msg("Successfully saved workflow run logs to S3")
 	}
 }
