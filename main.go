@@ -99,5 +99,9 @@ func main() {
 		if err != nil {
 			log.Fatal().Err(err)
 		}
+		log.Info().
+			Str("s3BucketName", *inputS3BucketName).
+			Str("s3Key", *inputS3Key).
+			Msg("Successfully saved workflow run logs to S3")
 	}
 }
