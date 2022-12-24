@@ -49,7 +49,7 @@ func downloadFileByURL(url string) (string, error) {
 
 func main() {
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr, TimeFormat: time.RFC3339})
-	if getRequiredEnv(envVarRunnerDebug) == "1" {
+	if os.Getenv(envVarRunnerDebug) == "1" {
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)
 	} else {
 		zerolog.SetGlobalLevel(zerolog.InfoLevel)
