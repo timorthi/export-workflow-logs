@@ -8,6 +8,19 @@ inputs:
   run-id:
     description: "The workflow run ID to export logs for"
     required: true
+  destination:
+    description: "The service to export workflow logs to"
+    required: true
+  aws-access-key-id:
+    description: "AWS Access Key ID. Required if destination is 's3'."
+  aws-secret-access-key:
+    description: "AWS Secret Access Key. Required if destination is 's3'."
+  aws-region:
+    description: "AWS Region in which the S3 bucket is located. Required if destination is 's3'."
+  s3-bucket-name:
+    description: "S3 Bucket to export workflow logs to. Required if destination is 's3'."
+  s3-key:
+    description: "S3 path to save the workflow logs to. Required if destination is 's3'."
 
 runs:
   using: "docker"
@@ -15,3 +28,9 @@ runs:
   args:
     - --repo-token=${{ inputs.repo-token }}
     - --run-id=${{ inputs.run-id }}
+    - --destination=${{ inputs.destination }}
+    - --aws-access-key-id=${{ inputs.aws-access-key-id }}
+    - --aws-secret-access-key=${{ inputs.aws-secret-access-key }}
+    - --aws-region=${{ inputs.aws-region }}
+    - --s3-bucket-name=${{ inputs.s3-bucket-name }}
+    - --s3-key=${{ inputs.s3-key }}
