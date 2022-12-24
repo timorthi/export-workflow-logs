@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"flag"
 	"io"
 	"net/http"
 	"os"
@@ -56,8 +55,12 @@ func main() {
 	}
 
 	log.Debug().Msg("Attempting to parse and validate Action inputs")
-	flag.Parse()
-	log.Info().Msg("Parsed and validated Action inputs")
+	err := validateActionInputs()
+	if err != nil {
+		log.Fatal().Err(err)
+	} else {
+		log.Info().Msg("Parsed and validated Action inputs")
+	}
 
 	client := githubClient()
 
