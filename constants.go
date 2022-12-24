@@ -7,6 +7,7 @@ const (
 	envVarRepoOwner       string = "GITHUB_REPOSITORY_OWNER"
 	envVarRepoFullName    string = "GITHUB_REPOSITORY"
 	envVarGitHubWorkspace string = "GITHUB_WORKSPACE"
+	envVarRunnerDebug     string = "RUNNER_DEBUG"
 
 	tempFileName string = "logs.zip"
 )
