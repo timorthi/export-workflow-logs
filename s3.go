@@ -16,7 +16,7 @@ func S3Client() (*s3.Client, error) {
 	os.Setenv("AWS_ACCESS_KEY_ID", *inputAWSAccessKeyID)
 	os.Setenv("AWS_SECRET_ACCESS_KEY", *inputAWSSecretAccessKey)
 
-	cfg, err := config.LoadDefaultConfig(context.Background())
+	cfg, err := config.LoadDefaultConfig(context.Background(), config.WithRegion(*inputAWSRegion))
 	if err != nil {
 		return nil, err
 	}
