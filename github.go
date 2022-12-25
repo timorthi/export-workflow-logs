@@ -26,11 +26,11 @@ func getWorkflowRunLogsURLForRunID(client *github.Client, workflowRunID int64) (
 	if err != nil {
 		return nil, err
 	}
-	repoOwnerFullName, err := getRequiredEnv(envVarRepoFullName)
+	repoFullName, err := getRequiredEnv(envVarRepoFullName)
 	if err != nil {
 		return nil, err
 	}
-	repoName := strings.Split(repoOwnerFullName, "/")[1]
+	repoName := strings.Split(repoFullName, "/")[1]
 
 	log.Debug().
 		Str("repoName", repoName).
