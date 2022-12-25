@@ -26,15 +26,15 @@ var (
 // In particular, ensures that the destination is valid and any other inputs
 // required for that destination are present.
 func validateActionInputs() error {
-	var matchedDestination *string
+	var matchedDestination string
 	for _, destination := range supportedDestinations {
 		if strings.EqualFold(destination, *inputDestination) {
-			*matchedDestination = destination
+			matchedDestination = destination
 			log.Debug().Str("matchedDestination", destination).Msg("Matched input with a supported destination")
 			break
 		}
 	}
-	if matchedDestination == nil {
+	if matchedDestination == "" {
 		return fmt.Errorf(
 			"supplied destination %s is invalid. Supported values are: %s",
 			*inputDestination,
@@ -42,7 +42,7 @@ func validateActionInputs() error {
 		)
 	}
 
-	if *matchedDestination == "s3" {
+	if matchedDestination == "s3" {
 		log.Debug().Msg("Validating Action inputs for S3")
 		inputFlagsToAssertNotEmpty := map[string]string{
 			inputKeyAWSAccessKeyID:     *inputAWSAccessKeyID,
