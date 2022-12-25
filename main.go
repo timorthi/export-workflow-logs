@@ -31,9 +31,8 @@ func main() {
 	err := validateActionInputs()
 	if err != nil {
 		log.Fatal().Err(err)
-	} else {
-		log.Info().Msg("Validated Action inputs")
 	}
+	log.Info().Msg("Validated Action inputs")
 
 	client := githubClient()
 
