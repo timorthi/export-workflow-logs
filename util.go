@@ -45,6 +45,7 @@ func downloadFileByURL(url string) (string, error) {
 	return tempFilePath, nil
 }
 
+// Returns the environment variable or an error if it is not set
 func getRequiredEnv(envVarName string) (string, error) {
 	val, exists := os.LookupEnv(envVarName)
 	if !exists {
