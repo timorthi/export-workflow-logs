@@ -11,6 +11,7 @@ import (
 )
 
 func downloadFileByURL(url string) (pathToSavedFile string, err error) {
+	log.Debug().Str("url", url).Msg("Making request to URL")
 	resp, err := http.Get(url)
 	if err != nil {
 		return "", err
@@ -26,16 +27,15 @@ func downloadFileByURL(url string) (pathToSavedFile string, err error) {
 	if err != nil {
 		return "", err
 	}
-
 	pathToSavedFile = path.Join(tmpDir, tempFileName)
-	log.Debug().Str("pathToSavedFile", pathToSavedFile).Msg("Creating temp file and writing contents to file")
-
+	log.Debug().Str("pathToSavedFile", pathToSavedFile).Msg("Creating temp file")
 	out, err := os.Create(pathToSavedFile)
 	if err != nil {
 		return "", err
 	}
 	defer out.Close()
 
+	log.Debug().Str("pathToSavedFile", pathToSavedFile).Msg("Writing response body to temp file")
 	_, err = io.Copy(out, resp.Body)
 	if err != nil {
 		os.RemoveAll(tmpDir)
