@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestErrorOnInvalidDestination(t *testing.T) {
+func TestValidateActionInputsErrorOnInvalidDestination(t *testing.T) {
 	flag.Set(inputKeyDestination, "someUnsupportedDestination")
 
 	err := validateActionInputs()
@@ -14,7 +14,7 @@ func TestErrorOnInvalidDestination(t *testing.T) {
 	}
 }
 
-func TestErrorOnIncompleteFlags(t *testing.T) {
+func TestValidateActionInputsErrorOnIncompleteFlags(t *testing.T) {
 	flag.Set(inputKeyRepoToken, "testRepoToken")
 	flag.Set(inputKeyWorkflowRunID, "123")
 
@@ -50,7 +50,7 @@ func TestErrorOnIncompleteFlags(t *testing.T) {
 
 	}
 }
-func TestSuccessCase(t *testing.T) {
+func TestValidateActionInputsSuccessCase(t *testing.T) {
 	flag.Set(inputKeyRepoToken, "testRepoToken")
 	flag.Set(inputKeyWorkflowRunID, "123")
 
