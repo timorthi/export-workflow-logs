@@ -3,8 +3,6 @@ package main
 import (
 	"context"
 	"flag"
-	"io"
-	"net/http"
 	"os"
 	"path"
 	"strings"
@@ -13,39 +11,6 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
-
-func downloadFileByURL(url string) (string, error) {
-	// Get the data
-	resp, err := http.Get(url)
-	if err != nil {
-		return "", err
-	}
-	defer resp.Body.Close()
-
-	tmpDir, err := os.MkdirTemp(getRequiredEnv(envVarGitHubWorkspace), "tmp")
-	if err != nil {
-		return "", err
-	}
-
-	// Create the file
-	tempFilePath := path.Join(tmpDir, tempFileName)
-	log.Debug().Str("tempFilePath", tempFilePath).Msg("Creating temp file and writing contents to file")
-
-	out, err := os.Create(tempFilePath)
-	if err != nil {
-		return "", err
-	}
-	defer out.Close()
-
-	// Write the body to file
-	_, err = io.Copy(out, resp.Body)
-	if err != nil {
-		os.RemoveAll(tmpDir)
-		return "", err
-	}
-
-	return tempFilePath, nil
-}
 
 func init() {
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr, TimeFormat: time.RFC3339})
