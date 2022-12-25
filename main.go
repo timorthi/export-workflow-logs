@@ -46,7 +46,7 @@ func downloadFileByURL(url string) (string, error) {
 	return tempFilePath, nil
 }
 
-func main() {
+func init() {
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr, TimeFormat: time.RFC3339})
 	if os.Getenv(envVarRunnerDebug) == "1" {
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)
@@ -54,12 +54,16 @@ func main() {
 		zerolog.SetGlobalLevel(zerolog.InfoLevel)
 	}
 
-	log.Debug().Msg("Attempting to parse and validate Action inputs")
+	flag.Parse()
+}
+
+func main() {
+	log.Debug().Msg("Attempting to validate Action inputs")
 	err := validateActionInputs()
 	if err != nil {
 		log.Fatal().Err(err)
 	} else {
-		log.Info().Msg("Parsed and validated Action inputs")
+		log.Info().Msg("Validated Action inputs")
 	}
 
 	client := githubClient()

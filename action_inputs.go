@@ -26,8 +26,6 @@ var (
 // In particular, ensures that the destination is valid and any other inputs
 // required for that destination are present.
 func validateActionInputs() error {
-	flag.Parse()
-
 	var matchedDestination *string
 	for _, destination := range supportedDestinations {
 		if strings.EqualFold(destination, *inputDestination) {
