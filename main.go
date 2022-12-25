@@ -3,49 +3,13 @@ package main
 import (
 	"context"
 	"flag"
-	"io"
-	"net/http"
 	"os"
-	"path"
 	"strings"
 	"time"
 
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
-
-func downloadFileByURL(url string) (string, error) {
-	// Get the data
-	resp, err := http.Get(url)
-	if err != nil {
-		return "", err
-	}
-	defer resp.Body.Close()
-
-	tmpDir, err := os.MkdirTemp(getRequiredEnv(envVarGitHubWorkspace), "tmp")
-	if err != nil {
-		return "", err
-	}
-
-	// Create the file
-	tempFilePath := path.Join(tmpDir, tempFileName)
-	log.Debug().Str("tempFilePath", tempFilePath).Msg("Creating temp file and writing contents to file")
-
-	out, err := os.Create(tempFilePath)
-	if err != nil {
-		return "", err
-	}
-	defer out.Close()
-
-	// Write the body to file
-	_, err = io.Copy(out, resp.Body)
-	if err != nil {
-		os.RemoveAll(tmpDir)
-		return "", err
-	}
-
-	return tempFilePath, nil
-}
 
 func init() {
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr, TimeFormat: time.RFC3339})
@@ -66,39 +30,28 @@ func main() {
 	err := validateActionInputs()
 	if err != nil {
 		log.Fatal().Err(err)
-	} else {
-		log.Info().Msg("Validated Action inputs")
 	}
+	log.Info().Msg("Validated Action inputs")
 
+	workflowRunID := *inputWorkflowRunIDPtr
+	log.Debug().Int64("workflowRunID", workflowRunID).Msg("Attempting to get workflow run logs URL via GitHub API")
 	client := githubClient()
-
-	repoOwner := getRequiredEnv(envVarRepoOwner)
-	repoName := strings.Split(getRequiredEnv(envVarRepoFullName), "/")[1]
-	inputWorkflowRunID := *inputWorkflowRunIDPtr
-	log.Debug().
-		Str("repoName", repoName).
-		Str("repoOwner", repoOwner).
-		Int64("workflowRunID", inputWorkflowRunID).
-		Msg("Attempting to fetch workflow run logs")
-
-	url, _, err := client.Actions.GetWorkflowRunLogs(
-		context.Background(),
-		repoOwner,
-		repoName,
-		inputWorkflowRunID,
-		true,
-	)
+	workflowRunLogsURL, err := getWorkflowRunLogsURLForRunID(client, workflowRunID)
 	if err != nil {
 		log.Fatal().Err(err)
 	}
+	log.Info().Int64("workflowRunID", workflowRunID).Msg("Fetched URL to download workflow logs")
 
-	log.Debug().Str("url", url.String()).Msg("Attempting to download workflow run logs by URL")
-	pathToFile, err := downloadFileByURL(url.String())
+	workflowRunLogsURLStr := workflowRunLogsURL.String()
+	log.Debug().Str("url", workflowRunLogsURLStr).Msg("Attempting to download workflow run logs by URL")
+	pathToFile, err := downloadFileByURL(workflowRunLogsURL.String())
 	if err != nil {
 		log.Fatal().Err(err)
 	}
-	defer os.RemoveAll(path.Dir(pathToFile))
-	log.Info().Int64("workflowRunID", inputWorkflowRunID).Msg("Successfully downloaded workflow run logs")
+	log.Info().
+		Int64("workflowRunID", workflowRunID).
+		Str("url", workflowRunLogsURLStr).
+		Msg("Successfully downloaded workflow run logs")
 
 	if strings.EqualFold(*inputDestination, "s3") {
 		log.Debug().Msg("Attempting to upload workflow logs to S3")

@@ -1,15 +1,56 @@
 package main
 
 import (
+	"fmt"
+	"io"
+	"net/http"
 	"os"
+	"path"
 
 	"github.com/rs/zerolog/log"
 )
 
-func getRequiredEnv(envVarName string) string {
+func downloadFileByURL(url string) (pathToSavedFile string, err error) {
+	log.Debug().Str("url", url).Msg("Making request to URL")
+	resp, err := http.Get(url)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	githubWorkspace, err := getRequiredEnv(envVarGitHubWorkspace)
+	if err != nil {
+		return "", err
+	}
+
+	tmpDir, err := os.MkdirTemp(githubWorkspace, "tmp")
+	if err != nil {
+		return "", err
+	}
+	pathToSavedFile = path.Join(tmpDir, tempFileName)
+	log.Debug().Str("pathToSavedFile", pathToSavedFile).Msg("Creating temp file")
+	out, err := os.Create(pathToSavedFile)
+	if err != nil {
+		return "", err
+	}
+	defer out.Close()
+
+	log.Debug().Str("pathToSavedFile", pathToSavedFile).Msg("Writing response body to temp file")
+	_, err = io.Copy(out, resp.Body)
+	if err != nil {
+		os.RemoveAll(tmpDir)
+		return "", err
+	}
+
+	return pathToSavedFile, nil
+}
+
+// Returns the environment variable or an error if it is not set
+func getRequiredEnv(envVarName string) (string, error) {
 	val, exists := os.LookupEnv(envVarName)
 	if !exists {
-		log.Fatal().Str("envVarName", envVarName).Msg("Env var does not exist")
+		return "", fmt.Errorf("env var '%s' does not exist", envVarName)
+
 	}
-	return val
+	return val, nil
 }

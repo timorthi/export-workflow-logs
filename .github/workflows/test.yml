@@ -4,6 +4,9 @@ on:
   pull_request:
     branches:
       - main
+  push:
+    branches:
+      - main
 
 jobs:
   test:
@@ -17,4 +20,4 @@ jobs:
           cache: true
 
       - name: Test
-        run: go test -v
+        run: make test

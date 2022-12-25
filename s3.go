@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"os"
+	"path"
 
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -31,6 +32,7 @@ func saveToS3(ctx context.Context, api S3PutObjectAPI, bucket string, key string
 		return err
 	}
 	defer logsFile.Close()
+	defer os.RemoveAll(path.Dir(pathToLogsFile))
 
 	putObjectInput := s3.PutObjectInput{
 		Bucket: &bucket,
