@@ -10,7 +10,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func downloadFileByURL(url string) (string, error) {
+func downloadFileByURL(url string) (pathToSavedFile string, err error) {
 	resp, err := http.Get(url)
 	if err != nil {
 		return "", err
@@ -27,10 +27,10 @@ func downloadFileByURL(url string) (string, error) {
 		return "", err
 	}
 
-	tempFilePath := path.Join(tmpDir, tempFileName)
-	log.Debug().Str("tempFilePath", tempFilePath).Msg("Creating temp file and writing contents to file")
+	pathToSavedFile = path.Join(tmpDir, tempFileName)
+	log.Debug().Str("pathToSavedFile", pathToSavedFile).Msg("Creating temp file and writing contents to file")
 
-	out, err := os.Create(tempFilePath)
+	out, err := os.Create(pathToSavedFile)
 	if err != nil {
 		return "", err
 	}
@@ -42,7 +42,7 @@ func downloadFileByURL(url string) (string, error) {
 		return "", err
 	}
 
-	return tempFilePath, nil
+	return pathToSavedFile, nil
 }
 
 // Returns the environment variable or an error if it is not set
