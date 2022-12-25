@@ -34,35 +34,26 @@ func main() {
 	}
 	log.Info().Msg("Validated Action inputs")
 
+	workflowRunID := *inputWorkflowRunIDPtr
+	log.Debug().Int64("workflowRunID", workflowRunID).Msg("Attempting to get workflow run logs URL via GitHub API")
 	client := githubClient()
-
-	repoOwner := getRequiredEnv(envVarRepoOwner)
-	repoName := strings.Split(getRequiredEnv(envVarRepoFullName), "/")[1]
-	inputWorkflowRunID := *inputWorkflowRunIDPtr
-	log.Debug().
-		Str("repoName", repoName).
-		Str("repoOwner", repoOwner).
-		Int64("workflowRunID", inputWorkflowRunID).
-		Msg("Attempting to fetch workflow run logs")
-
-	url, _, err := client.Actions.GetWorkflowRunLogs(
-		context.Background(),
-		repoOwner,
-		repoName,
-		inputWorkflowRunID,
-		true,
-	)
+	workflowRunLogsURL, err := getWorkflowRunLogsURLForRunID(client, workflowRunID)
 	if err != nil {
 		log.Fatal().Err(err)
 	}
+	log.Info().Int64("workflowRunID", workflowRunID).Msg("Fetched URL to download workflow logs")
 
-	log.Debug().Str("url", url.String()).Msg("Attempting to download workflow run logs by URL")
-	pathToFile, err := downloadFileByURL(url.String())
+	workflowRunLogsURLStr := workflowRunLogsURL.String()
+	log.Debug().Str("url", workflowRunLogsURLStr).Msg("Attempting to download workflow run logs by URL")
+	pathToFile, err := downloadFileByURL(workflowRunLogsURL.String())
 	if err != nil {
 		log.Fatal().Err(err)
 	}
 	defer os.RemoveAll(path.Dir(pathToFile))
-	log.Info().Int64("workflowRunID", inputWorkflowRunID).Msg("Successfully downloaded workflow run logs")
+	log.Info().
+		Int64("workflowRunID", workflowRunID).
+		Str("url", workflowRunLogsURLStr).
+		Msg("Successfully downloaded workflow run logs")
 
 	if strings.EqualFold(*inputDestination, "s3") {
 		log.Debug().Msg("Attempting to upload workflow logs to S3")

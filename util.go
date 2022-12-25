@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -16,7 +17,12 @@ func downloadFileByURL(url string) (string, error) {
 	}
 	defer resp.Body.Close()
 
-	tmpDir, err := os.MkdirTemp(getRequiredEnv(envVarGitHubWorkspace), "tmp")
+	githubWorkspace, err := getRequiredEnv(envVarGitHubWorkspace)
+	if err != nil {
+		return "", err
+	}
+
+	tmpDir, err := os.MkdirTemp(githubWorkspace, "tmp")
 	if err != nil {
 		return "", err
 	}
@@ -39,10 +45,11 @@ func downloadFileByURL(url string) (string, error) {
 	return tempFilePath, nil
 }
 
-func getRequiredEnv(envVarName string) string {
+func getRequiredEnv(envVarName string) (string, error) {
 	val, exists := os.LookupEnv(envVarName)
 	if !exists {
-		log.Fatal().Str("envVarName", envVarName).Msg("Env var does not exist")
+		return "", fmt.Errorf("env var '%s' does not exist", envVarName)
+
 	}
-	return val
+	return val, nil
 }
