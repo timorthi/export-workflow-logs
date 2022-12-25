@@ -7,6 +7,7 @@ import (
 
 func TestValidateActionInputsErrorOnInvalidDestination(t *testing.T) {
 	flag.Set(inputKeyDestination, "someUnsupportedDestination")
+	defer flag.Set(inputKeyDestination, "")
 
 	err := validateActionInputs()
 	if err == nil {
@@ -14,17 +15,32 @@ func TestValidateActionInputsErrorOnInvalidDestination(t *testing.T) {
 	}
 }
 
-func TestValidateActionInputsErrorOnIncompleteFlags(t *testing.T) {
+func TestValidateActionInputs(t *testing.T) {
 	flag.Set(inputKeyRepoToken, "testRepoToken")
 	flag.Set(inputKeyWorkflowRunID, "123")
+	defer flag.Set(inputKeyRepoToken, "")
+	defer flag.Set(inputKeyWorkflowRunID, "")
 
 	testCases := []struct {
-		testDescription  string
-		destination      string
+		desc             string
+		shouldSucceed    bool
 		inputValuesByKey map[string]string
 	}{
 		{
-			testDescription: "S3 destination",
+			desc:          "S3 destination success case",
+			shouldSucceed: true,
+			inputValuesByKey: map[string]string{
+				inputKeyDestination:        "s3",
+				inputKeyAWSAccessKeyID:     "abc",
+				inputKeyAWSSecretAccessKey: "abc",
+				inputKeyAWSRegion:          "someregion",
+				inputKeyS3BucketName:       "my-bucket",
+				inputKeyS3Key:              "some/key",
+			},
+		},
+		{
+			desc:          "S3 destination failure case",
+			shouldSucceed: false,
 			inputValuesByKey: map[string]string{
 				inputKeyDestination:        "s3",
 				inputKeyAWSAccessKeyID:     "abc",
@@ -36,53 +52,19 @@ func TestValidateActionInputsErrorOnIncompleteFlags(t *testing.T) {
 		},
 	}
 
-	for _, tc := range testCases {
-		t.Run(tc.testDescription, func(t *testing.T) {
-			for key, value := range tc.inputValuesByKey {
+	for _, tC := range testCases {
+		t.Run(tC.desc, func(t *testing.T) {
+			for key, value := range tC.inputValuesByKey {
 				flag.Set(key, value)
+				defer flag.Set(key, "") // Clean up flags by "unsetting" them after this test
 			}
 
 			err := validateActionInputs()
-			if err == nil {
-				t.Error("Expected validateActionInputs to return error, got nil")
-			}
-		})
-
-	}
-}
-func TestValidateActionInputsSuccessCase(t *testing.T) {
-	flag.Set(inputKeyRepoToken, "testRepoToken")
-	flag.Set(inputKeyWorkflowRunID, "123")
-
-	testCases := []struct {
-		testDescription  string
-		destination      string
-		inputValuesByKey map[string]string
-	}{
-		{
-			testDescription: "S3 destination",
-			inputValuesByKey: map[string]string{
-				inputKeyDestination:        "s3",
-				inputKeyAWSAccessKeyID:     "abc",
-				inputKeyAWSSecretAccessKey: "abc",
-				inputKeyAWSRegion:          "someregion",
-				inputKeyS3BucketName:       "my-bucket",
-				inputKeyS3Key:              "some/key",
-			},
-		},
-	}
-
-	for _, tc := range testCases {
-		t.Run(tc.testDescription, func(t *testing.T) {
-			for key, value := range tc.inputValuesByKey {
-				flag.Set(key, value)
-			}
-
-			err := validateActionInputs()
-			if err != nil {
+			if tC.shouldSucceed && err != nil {
 				t.Errorf("Expected validateActionInputs to return nil, got error: %v", err)
+			} else if !tC.shouldSucceed && err == nil {
+				t.Error("Expected validateActionInputs to error, but it succeeded")
 			}
 		})
-
 	}
 }
