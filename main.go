@@ -4,7 +4,6 @@ import (
 	"context"
 	"flag"
 	"os"
-	"path"
 	"strings"
 	"time"
 
@@ -49,7 +48,6 @@ func main() {
 	if err != nil {
 		log.Fatal().Err(err)
 	}
-	defer os.RemoveAll(path.Dir(pathToFile))
 	log.Info().
 		Int64("workflowRunID", workflowRunID).
 		Str("url", workflowRunLogsURLStr).

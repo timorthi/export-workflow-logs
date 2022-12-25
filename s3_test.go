@@ -52,4 +52,8 @@ func TestSaveToS3(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	if _, err := os.Stat(tmpDir); !os.IsNotExist(err) {
+		t.Fatalf("expected temp dir to have been cleaned up, but got err: %v", err)
+	}
 }
