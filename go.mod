@@ -6,6 +6,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/config v1.18.7
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.29.6
 	github.com/google/go-github/v48 v48.2.0
+	github.com/migueleliasweb/go-github-mock v0.0.13
 	github.com/rs/zerolog v1.28.0
 	golang.org/x/oauth2 v0.3.0
 )
@@ -28,7 +29,9 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/sts v1.17.7 // indirect
 	github.com/aws/smithy-go v1.13.5 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
+	github.com/google/go-github/v41 v41.0.0 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
+	github.com/gorilla/mux v1.8.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.16 // indirect
 	golang.org/x/crypto v0.0.0-20210817164053-32db794688a5 // indirect
