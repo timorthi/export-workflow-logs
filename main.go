@@ -47,17 +47,28 @@ func downloadFileByURL(url string) (string, error) {
 	return tempFilePath, nil
 }
 
-func main() {
+func init() {
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr, TimeFormat: time.RFC3339})
 	if os.Getenv(envVarRunnerDebug) == "1" {
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)
 	} else {
 		zerolog.SetGlobalLevel(zerolog.InfoLevel)
 	}
+}
 
-	log.Debug().Msg("Attempting to parse and validate Action inputs")
+func main() {
+	// https://go.dev/doc/go1.13#testing
+	// ...testing flags are now only registered when running a test binary, and packages that call
+	// flag.Parse during package initialization may cause tests to fail.
 	flag.Parse()
-	log.Info().Msg("Parsed and validated Action inputs")
+
+	log.Debug().Msg("Attempting to validate Action inputs")
+	err := validateActionInputs()
+	if err != nil {
+		log.Fatal().Err(err)
+	} else {
+		log.Info().Msg("Validated Action inputs")
+	}
 
 	client := githubClient()
 

@@ -1,7 +1,5 @@
 package main
 
-import "flag"
-
 const (
 	// GitHub Actions default env vars reference: https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables
 	envVarRepoOwner       string = "GITHUB_REPOSITORY_OWNER"
@@ -9,17 +7,18 @@ const (
 	envVarGitHubWorkspace string = "GITHUB_WORKSPACE"
 	envVarRunnerDebug     string = "RUNNER_DEBUG"
 
+	inputKeyRepoToken          string = "repo-token"
+	inputKeyWorkflowRunID      string = "run-id"
+	inputKeyDestination        string = "destination"
+	inputKeyAWSAccessKeyID     string = "aws-access-key-id"
+	inputKeyAWSSecretAccessKey string = "aws-secret-access-key"
+	inputKeyAWSRegion          string = "aws-region"
+	inputKeyS3BucketName       string = "s3-bucket-name"
+	inputKeyS3Key              string = "s3-key"
+
 	tempFileName string = "logs.zip"
 )
 
 var (
-	inputRepoTokenPtr     *string = flag.String("repo-token", "", "GITHUB_TOKEN or a Personal Access Token")
-	inputWorkflowRunIDPtr *int64  = flag.Int64("run-id", 0, "GitHub Actions Workflow Run ID")
-	inputDestination      *string = flag.String("destination", "", "The service to export workflow logs to")
-
-	inputAWSAccessKeyID     *string = flag.String("aws-access-key-id", "", "AWS Access Key ID")
-	inputAWSSecretAccessKey *string = flag.String("aws-secret-access-key", "", "AWS Secret Access Key")
-	inputAWSRegion          *string = flag.String("aws-region", "us-east-1", "AWS Region for the S3 bucket")
-	inputS3BucketName       *string = flag.String("s3-bucket-name", "", "S3 bucket name")
-	inputS3Key              *string = flag.String("s3-key", "", "S3 key")
+	supportedDestinations = []string{"s3"}
 )
