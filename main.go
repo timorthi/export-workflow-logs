@@ -54,11 +54,14 @@ func init() {
 	} else {
 		zerolog.SetGlobalLevel(zerolog.InfoLevel)
 	}
-
-	flag.Parse()
 }
 
 func main() {
+	// https://go.dev/doc/go1.13#testing
+	// ...testing flags are now only registered when running a test binary, and packages that call
+	// flag.Parse during package initialization may cause tests to fail.
+	flag.Parse()
+
 	log.Debug().Msg("Attempting to validate Action inputs")
 	err := validateActionInputs()
 	if err != nil {
