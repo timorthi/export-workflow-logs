@@ -16,7 +16,7 @@ var (
 	// Required inputs for S3
 
 	inputAWSAccessKeyID     *string = flag.String(inputKeyAWSAccessKeyID, "", "AWS Access Key ID")
-	inputAWSSecretAccessKey *string = flag.String(inputKeyAWSAccessKeyID, "", "AWS Secret Access Key")
+	inputAWSSecretAccessKey *string = flag.String(inputKeyAWSSecretAccessKey, "", "AWS Secret Access Key")
 	inputAWSRegion          *string = flag.String(inputKeyAWSRegion, "us-east-1", "AWS Region for the S3 bucket")
 	inputS3BucketName       *string = flag.String(inputKeyS3BucketName, "", "S3 bucket name")
 	inputS3Key              *string = flag.String(inputKeyS3Key, "", "S3 key")
