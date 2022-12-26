@@ -1,6 +1,6 @@
 # export-workflow-logs
 
-[![Maintainability](https://api.codeclimate.com/v1/badges/adf5dcf95b53da6c741f/maintainability)](https://codeclimate.com/github/timorthi/export-workflow-logs/maintainability)
+[![Maintainability](https://api.codeclimate.com/v1/badges/adf5dcf95b53da6c741f/maintainability)](https://codeclimate.com/github/timorthi/export-workflow-logs/maintainability) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 `export-workflow-logs` is a GitHub Action to automatically export the logs of a GitHub Actions Workflow run to Amazon S3.
 
