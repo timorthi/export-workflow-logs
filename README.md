@@ -1,8 +1,10 @@
 # export-workflow-logs
 
-The logs for a GitHub Actions workflow run are only [available for a limited time](https://docs.github.com/en/organizations/managing-organization-settings/configuring-the-retention-period-for-github-actions-artifacts-and-logs-in-your-organization) before they are automatically deleted. Use this GitHub Action to export the logs to longer term storage such as Amazon S3.
+`export-workflow-logs` is a GitHub Action to automatically export the logs of a GitHub Actions Workflow run to Amazon S3.
 
-This Action uses the [Download workflow run logs API](https://docs.github.com/en/rest/actions/workflow-runs?apiVersion=2022-11-28#download-workflow-run-logs) to fetch the run logs. The logs are then saved as a `.zip` archive at the destination. For supported destinations, see [Usage](#usage).
+The logs for workflow run are only [available for a limited time](https://docs.github.com/en/organizations/managing-organization-settings/configuring-the-retention-period-for-github-actions-artifacts-and-logs-in-your-organization) before they are automatically deleted. This Action moves workflow run logs to longer term storage to make them easily accessible in the future for auditing purposes.
+
+This Action uses the [Download workflow run logs API](https://docs.github.com/en/rest/actions/workflow-runs?apiVersion=2022-11-28#download-workflow-run-logs) to fetch the run logs. The logs are then saved as an archive at the destination. For supported destinations, see [Usage](#usage).
 
 ## Quick Start
 
