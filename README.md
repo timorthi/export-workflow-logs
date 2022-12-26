@@ -99,4 +99,12 @@ This will force the workflow to build the image (and therefore the Go source cod
 
 ### Building & Releasing
 
-TODO
+See [release management for actions](https://docs.github.com/en/actions/creating-actions/about-custom-actions#using-release-management-for-actions) and [managing releases](https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository#about-release-management) for more info.
+
+1. The `ci` workflow will automatically build and push to GHCR on each merge to `main`.
+2. Find the [desired image tag](https://github.com/timorthi/export-workflow-logs/pkgs/container/export-workflow-logs) to pin to this release.
+3. Create a release branch and update `action.yml` to point to this image tag.
+4. Test pertinent changes in a GitHub Actions workflow by pointing to the release branch and merge if it looks good.
+5. Delete the major tag `git tag --delete v1 && git push --delete origin v1`
+6. Create the new tag for this release `git tag v1 && git tag v1.1.0 && git push origin --tags`
+7. Create a release

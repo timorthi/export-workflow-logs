@@ -1,5 +1,9 @@
 name: "Export Workflow Run Logs"
-description: "Uses the GitHub API to download workflow logs and upload them to the target destination."
+description: "An action to automatically export GitHub Actions Workflow run logs to Amazon S3."
+
+branding:
+  icon: "save"
+  color: "gray-dark"
 
 inputs:
   repo-token:
