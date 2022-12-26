@@ -35,7 +35,10 @@ func main() {
 
 	workflowRunID := *inputWorkflowRunIDPtr
 	log.Debug().Int64("workflowRunID", workflowRunID).Msg("Attempting to get workflow run logs URL via GitHub API")
-	client := githubClient()
+	client, err := githubClient()
+	if err != nil {
+		log.Fatal().Err(err)
+	}
 	workflowRunLogsURL, err := getWorkflowRunLogsURLForRunID(client, workflowRunID)
 	if err != nil {
 		log.Fatal().Err(err)

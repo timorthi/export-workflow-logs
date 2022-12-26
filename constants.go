@@ -3,7 +3,6 @@ package main
 const (
 	// GitHub Actions default env vars reference: https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables
 	envVarGitHubServerURL string = "GITHUB_SERVER_URL"
-	envVarGitHubAPIURL    string = "GITHUB_API_URL"
 	envVarRepoOwner       string = "GITHUB_REPOSITORY_OWNER"
 	envVarRepoFullName    string = "GITHUB_REPOSITORY"
 	envVarGitHubWorkspace string = "GITHUB_WORKSPACE"
