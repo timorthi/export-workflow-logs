@@ -45,15 +45,9 @@ jobs:
 
 ## Usage
 
-Workflow run logs can only be downloaded on completion of that workflow. To export workflow logs, you will have to run this action in a separate workflow that runs after the conclusion of an upstream workflow (see the [`workflow_run`](https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#workflow_run) event).
+Workflow run logs can only be downloaded on completion of that workflow. To export workflow logs, you will have to run this action in a separate workflow that runs after the conclusion of an upstream workflow (see the [`workflow_run`](https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#workflow_run) event). Attempting to export the workflow run logs of an in-progress workflow will result in a 404 error from the GitHub API.
 
-Usage of this action will depend on the intended destination of the workflow logs. This Action currently supports:
-
-* [Amazon S3](#amazon-s3)
-
-### Core Inputs
-
-The following inputs are required regardless of the chosen `destination`:
+The following inputs are required regardless of the chosen destination:
 
 | Name | Description |
 | - | - |
@@ -61,9 +55,11 @@ The following inputs are required regardless of the chosen `destination`:
 | `run-id` | The workflow run ID for which to export logs. Typically obtained via the `github` context per the above example. |
 | `destination` | The service to export workflow logs to. Supported values: `s3` |
 
+Further inputs are required and they are dependent on the intended destination of the workflow logs.
+
 ### [Amazon S3](https://aws.amazon.com/s3/)
 
-The S3 exporter uses the `S3PutObject` API to save the workflow logs file
+The S3 exporter uses the `S3PutObject` API to save the workflow logs file.
 
 The following inputs are required if `destination` is `s3`:
 | Name | Description |
