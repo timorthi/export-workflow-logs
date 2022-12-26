@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"net/url"
+	"os"
 	"strings"
 
 	"github.com/google/go-github/v48/github"
@@ -16,8 +17,12 @@ func githubClient() *github.Client {
 		&oauth2.Token{AccessToken: *inputRepoTokenPtr},
 	)
 	tc := oauth2.NewClient(ctx, ts)
-	client := github.NewClient(tc)
-	return client
+
+	serverURL := os.Getenv(envVarGitHubServerURL)
+	apiURL := os.Getenv(envVarGitHubAPIURL)
+	log.Debug().Str("serverURL", serverURL).Str("apiURL", apiURL).Msg("Using server URl and api URL")
+
+	return github.NewClient(tc)
 }
 
 // Uses the given workflowRunID and the GitHub Actions default environment variables to makes a GetWorkflowRunLogs call
