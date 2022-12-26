@@ -29,7 +29,7 @@ func main() {
 	log.Debug().Msg("Attempting to validate Action inputs")
 	err := validateActionInputs()
 	if err != nil {
-		log.Fatal().Err(err)
+		log.Fatal().Err(err).Msg("Error while validating Action inputs")
 	}
 	log.Info().Msg("Validated Action inputs")
 
@@ -37,19 +37,22 @@ func main() {
 	log.Debug().Int64("workflowRunID", workflowRunID).Msg("Attempting to get workflow run logs URL via GitHub API")
 	client, err := githubClient()
 	if err != nil {
-		log.Fatal().Err(err)
+		log.Fatal().Err(err).Msg("Error initializing GitHub client")
 	}
 	workflowRunLogsURL, err := getWorkflowRunLogsURLForRunID(client, workflowRunID)
 	if err != nil {
-		log.Fatal().Err(err)
+		log.Fatal().Err(err).Msg("Error while trying to fetch workflow run logs URL")
 	}
-	log.Info().Int64("workflowRunID", workflowRunID).Msg("Fetched URL to download workflow logs")
-
 	workflowRunLogsURLStr := workflowRunLogsURL.String()
+	log.Info().
+		Int64("workflowRunID", workflowRunID).
+		Str("url", workflowRunLogsURLStr).
+		Msg("Fetched URL to download workflow logs")
+
 	log.Debug().Str("url", workflowRunLogsURLStr).Msg("Attempting to download workflow run logs by URL")
 	pathToFile, err := downloadFileByURL(workflowRunLogsURL.String())
 	if err != nil {
-		log.Fatal().Err(err)
+		log.Fatal().Err(err).Msg("Error while downloading workflow logs")
 	}
 	log.Info().
 		Int64("workflowRunID", workflowRunID).
@@ -60,11 +63,11 @@ func main() {
 		log.Debug().Msg("Attempting to upload workflow logs to S3")
 		s3Client, err := s3Client()
 		if err != nil {
-			log.Fatal().Err(err)
+			log.Fatal().Err(err).Msg("Error initializing S3 client")
 		}
 		err = saveToS3(context.Background(), s3Client, *inputS3BucketName, *inputS3Key, pathToFile)
 		if err != nil {
-			log.Fatal().Err(err)
+			log.Fatal().Err(err).Msg("Error uploading workflow logs to S3")
 		}
 		log.Info().
 			Str("s3BucketName", *inputS3BucketName).
