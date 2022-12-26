@@ -17,21 +17,19 @@ func githubClient() (*github.Client, error) {
 	)
 	tc := oauth2.NewClient(ctx, ts)
 
-	client := github.NewClient(tc)
-
 	serverURL, err := getRequiredEnv(envVarGitHubServerURL)
 	if err != nil {
 		return nil, err
 	}
-	parsedServerURL, err := url.Parse(serverURL)
-	if err != nil {
-		return nil, err
+
+	if serverURL != githubDefaultBaseURL {
+		log.Debug().Str("serverURL", serverURL).
+			Msgf("Detected a non-default GITHUB_SERVER_URL value. Using GitHub Enterprise Client.")
+		return github.NewEnterpriseClient(serverURL, serverURL, tc)
 	}
 
-	client.BaseURL = parsedServerURL
-	log.Debug().Str("serverURL", serverURL).Msgf("Set GitHub Client BaseURL to value of '%s'", envVarGitHubServerURL)
-
-	return client, nil
+	log.Debug().Msg("Using regular GitHub client.")
+	return github.NewClient(tc), nil
 }
 
 // Uses the given workflowRunID and the GitHub Actions default environment variables to makes a GetWorkflowRunLogs call

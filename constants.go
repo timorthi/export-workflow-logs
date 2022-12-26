@@ -19,7 +19,8 @@ const (
 	inputKeyS3BucketName       string = "s3-bucket-name"
 	inputKeyS3Key              string = "s3-key"
 
-	tempFileName string = "logs.zip"
+	tempFileName         string = "logs.zip"
+	githubDefaultBaseURL string = "https://github.com"
 )
 
 var (
