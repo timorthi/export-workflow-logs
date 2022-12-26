@@ -73,3 +73,33 @@ The following inputs are required if `destination` is `s3`:
 | `aws-region` | Region of the S3 bucket to upload to. Example: `us-east-1`
 | `s3-bucket-name` | Name of the S3 bucket to upload to
 | `s3-key` | S3 key to save the workflow logs to
+
+## Development
+
+### Testing
+
+To run unit tests, run `make test`.
+
+To test changes in a GitHub Action, change `action.yml` to point to the Dockerfile:
+
+```yml
+runs:
+  using: "docker"
+  image: "Dockerfile"
+  args:
+    ...
+```
+
+Then, make sure the GitHub Actions workflow that calls this Action references the branch or commit in which you made this change.
+
+```yml
+- uses: timorthi/export-workflow-logs@my-feature-branch-1
+  with:
+    ...
+```
+
+This will force the workflow to build the image (and therefore the Go source code) on every run.
+
+### Building & Releasing
+
+TODO
