@@ -13,7 +13,7 @@ import (
 
 func init() {
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr, TimeFormat: time.RFC3339})
-	if os.Getenv(envVarRunnerDebug) == "1" {
+	if os.Getenv(envVarRunnerDebug) == "1" || os.Getenv(envVarDebug) == "true" {
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)
 	} else {
 		zerolog.SetGlobalLevel(zerolog.InfoLevel)

@@ -9,6 +9,8 @@ const (
 	envVarGitHubWorkspace string = "GITHUB_WORKSPACE"
 	envVarRunnerDebug     string = "RUNNER_DEBUG"
 
+	envVarDebug string = "DEBUG"
+
 	inputKeyRepoToken          string = "repo-token"
 	inputKeyWorkflowRunID      string = "run-id"
 	inputKeyDestination        string = "destination"
