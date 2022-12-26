@@ -10,14 +10,26 @@ import (
 	"golang.org/x/oauth2"
 )
 
-func githubClient() *github.Client {
+func githubClient() (*github.Client, error) {
 	ctx := context.Background()
 	ts := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: *inputRepoTokenPtr},
 	)
 	tc := oauth2.NewClient(ctx, ts)
-	client := github.NewClient(tc)
-	return client
+
+	serverURL, err := getRequiredEnv(envVarGitHubServerURL)
+	if err != nil {
+		return nil, err
+	}
+
+	if serverURL != githubDefaultBaseURL {
+		log.Debug().Str("serverURL", serverURL).
+			Msgf("Detected a non-default GITHUB_SERVER_URL value. Using GitHub Enterprise Client.")
+		return github.NewEnterpriseClient(serverURL, serverURL, tc)
+	}
+
+	log.Debug().Msg("Using regular GitHub client.")
+	return github.NewClient(tc), nil
 }
 
 // Uses the given workflowRunID and the GitHub Actions default environment variables to makes a GetWorkflowRunLogs call
