@@ -80,7 +80,11 @@ func main() {
 		if err != nil {
 			log.Panic().Err(err).Msg("Error initializing Blob Storage client")
 		}
-		err = saveToBlobStorage(ctx, blobStorageClient, pathToFile, *inputContainerName, *inputBlobName)
+		params := UploadFileParams{
+			containerName: *inputContainerName,
+			blobName:      *inputBlobName,
+		}
+		err = saveToBlobStorage(ctx, blobStorageClient, pathToFile, &params)
 		if err != nil {
 			log.Panic().Err(err).Msg("Error uploading workflow logs to Blob Storage")
 		}

@@ -21,7 +21,12 @@ func blobStorageClient() (*azblob.Client, error) {
 	return azblob.NewClientWithSharedKeyCredential(url, credential, nil)
 }
 
-func saveToBlobStorage(ctx context.Context, client *azblob.Client, pathToLogsFile string, containerName string, blobName string) error {
+type UploadFileParams struct {
+	containerName string
+	blobName      string
+}
+
+func saveToBlobStorage(ctx context.Context, client *azblob.Client, pathToLogsFile string, uploadFileParams *UploadFileParams) error {
 	logsFile, err := os.Open(pathToLogsFile)
 	if err != nil {
 		return err
@@ -29,7 +34,7 @@ func saveToBlobStorage(ctx context.Context, client *azblob.Client, pathToLogsFil
 	defer logsFile.Close()
 	defer os.RemoveAll(path.Dir(pathToLogsFile))
 
-	_, err = client.UploadFile(ctx, containerName, blobName, logsFile, nil)
+	_, err = client.UploadFile(ctx, uploadFileParams.containerName, uploadFileParams.blobName, logsFile, nil)
 	if err != nil {
 		return err
 	}
