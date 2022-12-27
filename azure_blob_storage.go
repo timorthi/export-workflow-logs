@@ -10,12 +10,13 @@ import (
 )
 
 func blobStorageClient() (*azblob.Client, error) {
-	credential, err := azblob.NewSharedKeyCredential("", "")
+	storageAccountName := *inputAzureStorageAccountName
+	credential, err := azblob.NewSharedKeyCredential(storageAccountName, *inputAzureStorageAccountKey)
 	if err != nil {
 		return nil, err
 	}
 
-	url := fmt.Sprintf("https://%s.blob.core.windows.net/", *inputAzureStorageAccountName)
+	url := fmt.Sprintf("https://%s.blob.core.windows.net/", storageAccountName)
 
 	return azblob.NewClientWithSharedKeyCredential(url, credential, nil)
 }
