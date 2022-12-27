@@ -21,11 +21,11 @@ func init() {
 }
 
 func main() {
-	ctx := context.Background()
 	// https://go.dev/doc/go1.13#testing
 	// ...testing flags are now only registered when running a test binary, and packages that call
 	// flag.Parse during package initialization may cause tests to fail.
 	flag.Parse()
+	ctx := context.Background()
 
 	log.Debug().Msg("Attempting to validate Action inputs")
 	err := validateActionInputs()
@@ -36,11 +36,11 @@ func main() {
 
 	workflowRunID := *inputWorkflowRunIDPtr
 	log.Debug().Int64("workflowRunID", workflowRunID).Msg("Attempting to get workflow run logs URL via GitHub API")
-	client, err := githubClient()
+	client, err := githubClient(ctx)
 	if err != nil {
 		log.Fatal().Err(err).Msg("Error initializing GitHub client")
 	}
-	workflowRunLogsURL, err := getWorkflowRunLogsURLForRunID(client, workflowRunID)
+	workflowRunLogsURL, err := getWorkflowRunLogsURLForRunID(ctx, client, workflowRunID)
 	if err != nil {
 		log.Fatal().Err(err).Msg("Error while trying to fetch workflow run logs URL")
 	}
@@ -51,7 +51,7 @@ func main() {
 		Msg("Fetched URL to download workflow logs")
 
 	log.Debug().Str("url", workflowRunLogsURLStr).Msg("Attempting to download workflow run logs by URL")
-	pathToFile, err := downloadFileByURL(workflowRunLogsURL.String())
+	pathToFile, err := downloadFileByURL(workflowRunLogsURLStr)
 	if err != nil {
 		log.Fatal().Err(err).Msg("Error while downloading workflow logs")
 	}
@@ -66,7 +66,7 @@ func main() {
 		if err != nil {
 			log.Fatal().Err(err).Msg("Error initializing S3 client")
 		}
-		err = saveToS3(context.Background(), s3Client, *inputS3BucketName, *inputS3Key, pathToFile)
+		err = saveToS3(ctx, s3Client, *inputS3BucketName, *inputS3Key, pathToFile)
 		if err != nil {
 			log.Fatal().Err(err).Msg("Error uploading workflow logs to S3")
 		}

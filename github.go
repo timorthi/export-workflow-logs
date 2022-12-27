@@ -10,8 +10,7 @@ import (
 	"golang.org/x/oauth2"
 )
 
-func githubClient() (*github.Client, error) {
-	ctx := context.Background()
+func githubClient(ctx context.Context) (*github.Client, error) {
 	ts := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: *inputRepoTokenPtr},
 	)
@@ -33,7 +32,7 @@ func githubClient() (*github.Client, error) {
 }
 
 // Uses the given workflowRunID and the GitHub Actions default environment variables to makes a GetWorkflowRunLogs call
-func getWorkflowRunLogsURLForRunID(client *github.Client, workflowRunID int64) (*url.URL, error) {
+func getWorkflowRunLogsURLForRunID(ctx context.Context, client *github.Client, workflowRunID int64) (*url.URL, error) {
 	repoOwner, err := getRequiredEnv(envVarRepoOwner)
 	if err != nil {
 		return nil, err
@@ -51,7 +50,7 @@ func getWorkflowRunLogsURLForRunID(client *github.Client, workflowRunID int64) (
 		Msg("Making GetWorkflowRunLogs request")
 
 	url, _, err := client.Actions.GetWorkflowRunLogs(
-		context.Background(),
+		ctx,
 		repoOwner,
 		repoName,
 		workflowRunID,
