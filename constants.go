@@ -24,5 +24,5 @@ const (
 )
 
 var (
-	supportedDestinations = []string{"s3"}
+	supportedDestinations = []string{"s3", "blobstorage"}
 )
