@@ -21,6 +21,7 @@ func init() {
 }
 
 func main() {
+	ctx := context.Background()
 	// https://go.dev/doc/go1.13#testing
 	// ...testing flags are now only registered when running a test binary, and packages that call
 	// flag.Parse during package initialization may cause tests to fail.
@@ -73,5 +74,15 @@ func main() {
 			Str("s3BucketName", *inputS3BucketName).
 			Str("s3Key", *inputS3Key).
 			Msg("Successfully saved workflow run logs to S3")
+	} else if strings.EqualFold(*inputDestination, "blobstorage") {
+		log.Debug().Msg("Attempting to upload workflow logs to Blob Storage")
+		blobStorageClient, err := blobStorageClient()
+		if err != nil {
+			log.Fatal().Err(err).Msg("Error initializing Blob Storage client")
+		}
+		err = saveToBlobStorage(ctx, blobStorageClient, pathToFile)
+		if err != nil {
+			log.Fatal().Err(err).Msg("Error uploading workflow logs to Blob Storage")
+		}
 	}
 }
