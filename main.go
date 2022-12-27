@@ -84,5 +84,9 @@ func main() {
 		if err != nil {
 			log.Panic().Err(err).Msg("Error uploading workflow logs to Blob Storage")
 		}
+		log.Info().
+			Str("containerName", *inputContainerName).
+			Str("blobName", *inputBlobName).
+			Msg("Successfully saved workflow run logs to Blob Storage")
 	}
 }
