@@ -28,7 +28,7 @@ inputs:
 
 runs:
   using: "docker"
-  image: docker://ghcr.io/timorthi/export-workflow-logs:sha-613ac49
+  image: Dockerfile
   args:
     - --repo-token=${{ inputs.repo-token }}
     - --run-id=${{ inputs.run-id }}
