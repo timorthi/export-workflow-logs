@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"path"
 
@@ -14,7 +15,7 @@ func blobStorageClient() (*azblob.Client, error) {
 		return nil, err
 	}
 
-	url := "https://<StorageAccountName>.blob.core.windows.net/" //replace <StorageAccountName> with your Azure storage account name
+	url := fmt.Sprintf("https://%s.blob.core.windows.net/", *inputAzureStorageAccountName)
 
 	return azblob.NewClientWithSharedKeyCredential(url, credential, nil)
 }
