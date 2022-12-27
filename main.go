@@ -85,8 +85,8 @@ func main() {
 			log.Panic().Err(err).Msg("Error initializing Blob Storage client")
 		}
 		params := UploadFileParams{
-			containerName: *inputContainerName,
-			blobName:      *inputBlobName,
+			ContainerName: *inputContainerName,
+			BlobName:      *inputBlobName,
 		}
 		err = saveToBlobStorage(ctx, blobStorageClient, pathToFile, &params)
 		if err != nil {

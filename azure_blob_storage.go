@@ -22,8 +22,8 @@ func blobStorageClient() (*azblob.Client, error) {
 }
 
 type UploadFileParams struct {
-	containerName string
-	blobName      string
+	ContainerName string
+	BlobName      string
 }
 
 func saveToBlobStorage(ctx context.Context, client *azblob.Client, pathToLogsFile string, uploadFileParams *UploadFileParams) error {
@@ -34,7 +34,7 @@ func saveToBlobStorage(ctx context.Context, client *azblob.Client, pathToLogsFil
 	defer logsFile.Close()
 	defer os.RemoveAll(path.Dir(pathToLogsFile))
 
-	_, err = client.UploadFile(ctx, uploadFileParams.containerName, uploadFileParams.blobName, logsFile, nil)
+	_, err = client.UploadFile(ctx, uploadFileParams.ContainerName, uploadFileParams.BlobName, logsFile, nil)
 	if err != nil {
 		return err
 	}
