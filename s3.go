@@ -26,7 +26,12 @@ func s3Client() (*s3.Client, error) {
 	return s3Client, nil
 }
 
-func saveToS3(ctx context.Context, api S3PutObjectAPI, bucket string, key string, pathToLogsFile string) error {
+type PutObjectParams struct {
+	Bucket string
+	Key    string
+}
+
+func saveToS3(ctx context.Context, api S3PutObjectAPI, pathToLogsFile string, putObjectParams PutObjectParams) error {
 	logsFile, err := os.Open(pathToLogsFile)
 	if err != nil {
 		return err
@@ -34,12 +39,11 @@ func saveToS3(ctx context.Context, api S3PutObjectAPI, bucket string, key string
 	defer logsFile.Close()
 	defer os.RemoveAll(path.Dir(pathToLogsFile))
 
-	putObjectInput := s3.PutObjectInput{
-		Bucket: &bucket,
-		Key:    &key,
+	_, err = api.PutObject(ctx, &s3.PutObjectInput{
+		Bucket: &putObjectParams.Bucket,
+		Key:    &putObjectParams.Key,
 		Body:   logsFile,
-	}
-	_, err = api.PutObject(ctx, &putObjectInput)
+	})
 	if err != nil {
 		return err
 	}
