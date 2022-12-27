@@ -7,20 +7,25 @@ const (
 	envVarRepoFullName    string = "GITHUB_REPOSITORY"
 	envVarGitHubWorkspace string = "GITHUB_WORKSPACE"
 	envVarRunnerDebug     string = "RUNNER_DEBUG"
+	envVarDebug           string = "DEBUG"
 
-	envVarDebug string = "DEBUG"
+	tempFileName         string = "logs.zip"
+	githubDefaultBaseURL string = "https://github.com"
 
-	inputKeyRepoToken          string = "repo-token"
-	inputKeyWorkflowRunID      string = "run-id"
-	inputKeyDestination        string = "destination"
+	inputKeyRepoToken     string = "repo-token"
+	inputKeyWorkflowRunID string = "run-id"
+	inputKeyDestination   string = "destination"
+
 	inputKeyAWSAccessKeyID     string = "aws-access-key-id"
 	inputKeyAWSSecretAccessKey string = "aws-secret-access-key"
 	inputKeyAWSRegion          string = "aws-region"
 	inputKeyS3BucketName       string = "s3-bucket-name"
 	inputKeyS3Key              string = "s3-key"
 
-	tempFileName         string = "logs.zip"
-	githubDefaultBaseURL string = "https://github.com"
+	inputKeyAzureStorageAccountName string = "azure-storage-account-name"
+	inputKeyAzureStorageAccountKey  string = "azure-storage-account-key"
+	inputKeyContainerName           string = "container-name"
+	inputKeyBlobName                string = "blob-name"
 )
 
 var (

@@ -25,6 +25,14 @@ inputs:
     description: "S3 Bucket to export workflow logs to. Required if destination is 's3'."
   s3-key:
     description: "S3 path to save the workflow logs to. Required if destination is 's3'."
+  azure-storage-account-name:
+    description: "The Azure storage account name. Required if destination is 'blobstorage'."
+  azure-storage-account-key:
+    description: "Access key for the storage account. Required if destination is 'blobstorage'."
+  container-name:
+    description: "Container name to save the workflow logs to. Required if destination is 'blobstorage'."
+  blob-name:
+    description: "Blob name to save the workflow logs as. Required if destination is 'blobstorage'."
 
 runs:
   using: "docker"
@@ -38,3 +46,7 @@ runs:
     - --aws-region=${{ inputs.aws-region }}
     - --s3-bucket-name=${{ inputs.s3-bucket-name }}
     - --s3-key=${{ inputs.s3-key }}
+    - --azure-storage-account-name=${{ inputs.azure-storage-account-name }}
+    - --azure-storage-account-key=${{ inputs.azure-storage-account-key }}
+    - --container-name=${{ inputs.container-name }}
+    - --blob-name=${{ inputs.blob-name }}
