@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -9,10 +8,10 @@ import (
 )
 
 func TestGetResponseBodyByURL(t *testing.T) {
-	testFileContents := "someFileContents"
+	testFileContents := strings.Repeat("A", 1024*1024) // 1MB
 
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, testFileContents)
+		w.Write([]byte(testFileContents))
 	}))
 	defer ts.Close()
 
