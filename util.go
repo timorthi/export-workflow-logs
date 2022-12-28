@@ -1,48 +1,32 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"net/http"
 	"os"
-	"path"
 
 	"github.com/rs/zerolog/log"
 )
 
-func downloadFileByURL(url string) (pathToSavedFile string, err error) {
+// Makes a GET request to the given URL and returns the response body in a buffer.
+func getResponseBodyByURL(url string) (*bytes.Buffer, error) {
 	log.Debug().Str("url", url).Msg("Making request to URL")
 	resp, err := http.Get(url)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	defer resp.Body.Close()
 
-	githubWorkspace, err := getRequiredEnv(envVarGitHubWorkspace)
+	buf := new(bytes.Buffer)
+	bytesRead, err := io.Copy(buf, resp.Body)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
+	log.Debug().Str("url", url).Int64("bytesRead", bytesRead).Msg("Wrote response body into buffer")
 
-	tmpDir, err := os.MkdirTemp(githubWorkspace, "tmp")
-	if err != nil {
-		return "", err
-	}
-	pathToSavedFile = path.Join(tmpDir, tempFileName)
-	log.Debug().Str("pathToSavedFile", pathToSavedFile).Msg("Creating temp file")
-	out, err := os.Create(pathToSavedFile)
-	if err != nil {
-		return "", err
-	}
-	defer out.Close()
-
-	log.Debug().Str("pathToSavedFile", pathToSavedFile).Msg("Writing response body to temp file")
-	_, err = io.Copy(out, resp.Body)
-	if err != nil {
-		os.RemoveAll(tmpDir)
-		return "", err
-	}
-
-	return pathToSavedFile, nil
+	return buf, nil
 }
 
 // Returns the environment variable or an error if it is not set

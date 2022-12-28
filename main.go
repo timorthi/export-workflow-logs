@@ -51,7 +51,7 @@ func main() {
 		Msg("Fetched URL to download workflow logs")
 
 	log.Debug().Str("url", workflowRunLogsURLStr).Msg("Attempting to download workflow run logs by URL")
-	pathToFile, err := downloadFileByURL(workflowRunLogsURLStr)
+	workflowRunLogs, err := getResponseBodyByURL(workflowRunLogsURLStr)
 	if err != nil {
 		log.Fatal().Err(err).Msg("Error while downloading workflow logs")
 	}
@@ -70,7 +70,7 @@ func main() {
 			Bucket: *inputS3BucketName,
 			Key:    *inputS3Key,
 		}
-		err = saveToS3(ctx, s3Client, pathToFile, params)
+		err = saveToS3(ctx, s3Client, workflowRunLogs, params)
 		if err != nil {
 			log.Fatal().Err(err).Msg("Error uploading workflow logs to S3")
 		}
@@ -88,7 +88,7 @@ func main() {
 			ContainerName: *inputContainerName,
 			BlobName:      *inputBlobName,
 		}
-		err = saveToBlobStorage(ctx, blobStorageClient, pathToFile, &params)
+		err = saveToBlobStorage(ctx, blobStorageClient, workflowRunLogs, &params)
 		if err != nil {
 			log.Panic().Err(err).Msg("Error uploading workflow logs to Blob Storage")
 		}

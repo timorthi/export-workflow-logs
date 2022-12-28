@@ -1,10 +1,9 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"fmt"
-	"os"
-	"path"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
 )
@@ -26,15 +25,8 @@ type UploadFileParams struct {
 	BlobName      string
 }
 
-func saveToBlobStorage(ctx context.Context, client *azblob.Client, pathToLogsFile string, uploadFileParams *UploadFileParams) error {
-	logsFile, err := os.Open(pathToLogsFile)
-	if err != nil {
-		return err
-	}
-	defer logsFile.Close()
-	defer os.RemoveAll(path.Dir(pathToLogsFile))
-
-	_, err = client.UploadFile(ctx, uploadFileParams.ContainerName, uploadFileParams.BlobName, logsFile, nil)
+func saveToBlobStorage(ctx context.Context, client *azblob.Client, contents *bytes.Buffer, uploadFileParams *UploadFileParams) error {
+	_, err := client.UploadBuffer(ctx, uploadFileParams.ContainerName, uploadFileParams.BlobName, contents.Bytes(), nil)
 	if err != nil {
 		return err
 	}

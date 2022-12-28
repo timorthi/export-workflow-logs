@@ -1,9 +1,9 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"os"
-	"path"
 
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -31,18 +31,11 @@ type PutObjectParams struct {
 	Key    string
 }
 
-func saveToS3(ctx context.Context, api S3PutObjectAPI, pathToLogsFile string, putObjectParams PutObjectParams) error {
-	logsFile, err := os.Open(pathToLogsFile)
-	if err != nil {
-		return err
-	}
-	defer logsFile.Close()
-	defer os.RemoveAll(path.Dir(pathToLogsFile))
-
-	_, err = api.PutObject(ctx, &s3.PutObjectInput{
+func saveToS3(ctx context.Context, api S3PutObjectAPI, contents *bytes.Buffer, putObjectParams PutObjectParams) error {
+	_, err := api.PutObject(ctx, &s3.PutObjectInput{
 		Bucket: &putObjectParams.Bucket,
 		Key:    &putObjectParams.Key,
-		Body:   logsFile,
+		Body:   contents,
 	})
 	if err != nil {
 		return err
