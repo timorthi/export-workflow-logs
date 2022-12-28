@@ -1,5 +1,5 @@
 name: "Export Workflow Run Logs"
-description: "An action to automatically export GitHub Actions Workflow run logs to Amazon S3."
+description: "An action to automatically export GitHub Actions Workflow run logs to popular cloud storage solutions like Amazon S3 and Azure Blob Storage."
 
 branding:
   icon: "save"

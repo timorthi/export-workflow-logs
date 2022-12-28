@@ -2,7 +2,7 @@
 
 [![Maintainability](https://api.codeclimate.com/v1/badges/adf5dcf95b53da6c741f/maintainability)](https://codeclimate.com/github/timorthi/export-workflow-logs/maintainability) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-`export-workflow-logs` is a GitHub Action to automatically export the logs of a GitHub Actions Workflow run to Amazon S3.
+`export-workflow-logs` is a GitHub Action to automatically export the logs of a GitHub Actions Workflow run to popular cloud storage solutions like Amazon S3 and Azure Blob Storage.
 
 The logs for workflow run are only [available for a limited time](https://docs.github.com/en/organizations/managing-organization-settings/configuring-the-retention-period-for-github-actions-artifacts-and-logs-in-your-organization) before they are automatically deleted. This Action moves workflow run logs to longer term storage to make them easily accessible in the future for auditing purposes.
 
@@ -58,9 +58,12 @@ The following inputs are required regardless of the chosen destination:
 | - | - |
 | `repo-token` | Token to use to fetch workflow logs. Typically the `GITHUB_TOKEN` secret. |
 | `run-id` | The workflow run ID for which to export logs. Typically obtained via the `github` context per the above example. |
-| `destination` | The service to export workflow logs to. Supported values: `s3` |
+| `destination` | The service to export workflow logs to. Supported values: `s3`, `blobstorage` |
 
-Further inputs are required and they are dependent on the intended destination of the workflow logs.
+Further inputs are required; the exact inputs depend on the intended destination of the workflow logs. Supported destinations include:
+
+- [Amazon S3](#amazon-s3) (`destination: s3`)
+- [Azure Blob Storage](#azure-blob-storage) (`destination: blobstorage`)
 
 ### [Amazon S3](https://aws.amazon.com/s3/)
 
@@ -74,6 +77,18 @@ The following inputs are required if `destination` is `s3`:
 | `aws-region` | Region of the S3 bucket to upload to. Example: `us-east-1`
 | `s3-bucket-name` | Name of the S3 bucket to upload to
 | `s3-key` | S3 key to save the workflow logs to
+
+### [Azure Blob Storage](https://azure.microsoft.com/en-us/products/storage/blobs/)
+
+The Blob Storage exporter uses the `UploadBuffer` API to save the workflow logs file.
+
+The following inputs are required if `destination` is `blobstorage`:
+| Name | Description |
+| - | - |
+| `azure-storage-account-name` | Azure Storage Account name |
+| `azure-storage-account-key` | Access key for the Storage Account |
+| `container-name` | The name of the Blob Storage Container to upload to |
+| `blob-name` | Blob name to save the workflow logs as |
 
 ## Development
 
