@@ -65,12 +65,7 @@ The following inputs are required regardless of the chosen destination:
 | - | - |
 | `repo-token` | Token to use to fetch workflow logs. Typically the `GITHUB_TOKEN` secret. |
 | `run-id` | The workflow run ID for which to export logs. Typically obtained via the `github` context per the above example. |
-| `destination` | The service to export workflow logs to. Supported values: `s3`, `blobstorage` |
-
-Further inputs are required; the exact inputs depend on the intended destination of the workflow logs. Supported destinations include:
-
-- [Amazon S3](#amazon-s3) (`destination: s3`)
-- [Azure Blob Storage](#azure-blob-storage) (`destination: blobstorage`)
+| `destination` | The service to export workflow logs to. Supported values: [`s3`](#amazon-s3), [`blobstorage`](#azure-blob-storage) |
 
 ### [Amazon S3](https://aws.amazon.com/s3/)
 
