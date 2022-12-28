@@ -81,7 +81,7 @@ func main() {
 		if err != nil {
 			log.Panic().Err(err).Msg("Error initializing Blob Storage client")
 		}
-		err = saveToBlobStorage(ctx, blobStorageClient, UploadParams{
+		err = saveToBlobStorage(ctx, blobStorageClient, UploadBufferParams{
 			ContainerName: *inputContainerName,
 			BlobName:      *inputBlobName,
 			Contents:      workflowRunLogs,

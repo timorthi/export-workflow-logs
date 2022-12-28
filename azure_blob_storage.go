@@ -20,13 +20,17 @@ func blobStorageClient() (*azblob.Client, error) {
 	return azblob.NewClientWithSharedKeyCredential(url, credential, nil)
 }
 
-type UploadParams struct {
+type UploadBufferAPI interface {
+	UploadBuffer(ctx context.Context, containerName string, blobName string, buffer []byte, o *azblob.UploadBufferOptions) (azblob.UploadBufferResponse, error)
+}
+
+type UploadBufferParams struct {
 	ContainerName string
 	BlobName      string
 	Contents      *bytes.Buffer
 }
 
-func saveToBlobStorage(ctx context.Context, client *azblob.Client, uploadParams UploadParams) error {
+func saveToBlobStorage(ctx context.Context, client UploadBufferAPI, uploadParams UploadBufferParams) error {
 	_, err := client.UploadBuffer(ctx, uploadParams.ContainerName, uploadParams.BlobName, uploadParams.Contents.Bytes(), nil)
 	if err != nil {
 		return err
