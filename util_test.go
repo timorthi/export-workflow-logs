@@ -9,7 +9,6 @@ import (
 )
 
 func TestGetResponseBodyByURL(t *testing.T) {
-	t.Setenv(envVarGitHubWorkspace, t.TempDir())
 	testFileContents := "someFileContents"
 
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

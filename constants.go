@@ -5,7 +5,6 @@ const (
 	envVarGitHubServerURL string = "GITHUB_SERVER_URL"
 	envVarRepoOwner       string = "GITHUB_REPOSITORY_OWNER"
 	envVarRepoFullName    string = "GITHUB_REPOSITORY"
-	envVarGitHubWorkspace string = "GITHUB_WORKSPACE"
 	envVarRunnerDebug     string = "RUNNER_DEBUG"
 	envVarDebug           string = "DEBUG"
 
