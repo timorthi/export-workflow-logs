@@ -10,7 +10,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-// Makes a GET request to the given URL and returns the response body in a buffer.
+// getResponseBodyByURL makes a GET request to the given URL and returns the response body in a buffer.
 func getResponseBodyByURL(url string) (*bytes.Buffer, error) {
 	log.Debug().Str("url", url).Msg("Making request to URL")
 	resp, err := http.Get(url)
@@ -29,7 +29,7 @@ func getResponseBodyByURL(url string) (*bytes.Buffer, error) {
 	return buf, nil
 }
 
-// Returns the environment variable or an error if it is not set
+// getRequiredEnv returns the environment variable or an error if it is not set.
 func getRequiredEnv(envVarName string) (string, error) {
 	val, exists := os.LookupEnv(envVarName)
 	if !exists {

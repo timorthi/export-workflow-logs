@@ -29,9 +29,8 @@ var (
 	inputBlobName                *string = flag.String(inputKeyBlobName, "", "Azure blob name")
 )
 
-// Validates input combinations that cannot be checked at the action-level.
-// In particular, ensures that the destination is valid and any other inputs
-// required for that destination are present.
+// validateActionInputs validates input combinations that cannot be checked at the action-level.
+// In particular, ensures that the destination is valid and any other inputs required for that destination are present.
 func validateActionInputs() error {
 	var matchedDestination string
 	for _, destination := range supportedDestinations {
