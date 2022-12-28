@@ -45,20 +45,16 @@ func main() {
 		log.Fatal().Err(err).Msg("Error while trying to fetch workflow run logs URL")
 	}
 	workflowRunLogsURLStr := workflowRunLogsURL.String()
-	log.Info().
-		Int64("workflowRunID", workflowRunID).
-		Str("url", workflowRunLogsURLStr).
+	log.Info().Int64("workflowRunID", workflowRunID).Str("url", workflowRunLogsURLStr).
 		Msg("Fetched URL to download workflow logs")
 
-	log.Debug().Str("url", workflowRunLogsURLStr).Msg("Attempting to download workflow run logs by URL")
+	log.Debug().Str("url", workflowRunLogsURLStr).Msg("Attempting to fetch workflow run logs by URL")
 	workflowRunLogs, err := getResponseBodyByURL(workflowRunLogsURLStr)
 	if err != nil {
-		log.Fatal().Err(err).Msg("Error while downloading workflow logs")
+		log.Fatal().Err(err).Msg("Error while fetched workflow logs")
 	}
-	log.Info().
-		Int64("workflowRunID", workflowRunID).
-		Str("url", workflowRunLogsURLStr).
-		Msg("Successfully downloaded workflow run logs")
+	log.Info().Int64("workflowRunID", workflowRunID).Str("url", workflowRunLogsURLStr).
+		Msg("Successfully fetched workflow run logs")
 
 	if strings.EqualFold(*inputDestination, "s3") {
 		log.Debug().Msg("Attempting to upload workflow logs to S3")
@@ -74,11 +70,12 @@ func main() {
 		if err != nil {
 			log.Fatal().Err(err).Msg("Error uploading workflow logs to S3")
 		}
-		log.Info().
-			Str("s3BucketName", *inputS3BucketName).
-			Str("s3Key", *inputS3Key).
+		log.Info().Str("s3BucketName", *inputS3BucketName).Str("s3Key", *inputS3Key).
 			Msg("Successfully saved workflow run logs to S3")
-	} else if strings.EqualFold(*inputDestination, "blobstorage") {
+		return
+	}
+
+	if strings.EqualFold(*inputDestination, "blobstorage") {
 		log.Debug().Msg("Attempting to upload workflow logs to Blob Storage")
 		blobStorageClient, err := blobStorageClient()
 		if err != nil {
@@ -92,9 +89,8 @@ func main() {
 		if err != nil {
 			log.Panic().Err(err).Msg("Error uploading workflow logs to Blob Storage")
 		}
-		log.Info().
-			Str("containerName", *inputContainerName).
-			Str("blobName", *inputBlobName).
+		log.Info().Str("containerName", *inputContainerName).Str("blobName", *inputBlobName).
 			Msg("Successfully saved workflow run logs to Blob Storage")
+		return
 	}
 }
