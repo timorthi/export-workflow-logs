@@ -2,7 +2,7 @@
 
 [![Maintainability](https://api.codeclimate.com/v1/badges/adf5dcf95b53da6c741f/maintainability)](https://codeclimate.com/github/timorthi/export-workflow-logs/maintainability) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-`export-workflow-logs` is a GitHub Action to automatically export the logs of a GitHub Actions Workflow run to Amazon S3.
+`export-workflow-logs` is a GitHub Action to automatically export the logs of a GitHub Actions Workflow run to popular cloud storage solutions like Amazon S3 and Azure Blob Storage.
 
 The logs for workflow run are only [available for a limited time](https://docs.github.com/en/organizations/managing-organization-settings/configuring-the-retention-period-for-github-actions-artifacts-and-logs-in-your-organization) before they are automatically deleted. This Action moves workflow run logs to longer term storage to make them easily accessible in the future for auditing purposes.
 
@@ -44,13 +44,20 @@ jobs:
           aws-secret-access-key: ${{ secrets. AWS_SECRET_ACCESS_KEY }}
           aws-region: us-west-1
           s3-bucket-name: my-workflow-logs
+          # https://docs.github.com/developers/webhooks-and-events/webhooks/webhook-events-and-payloads?actionType=requested#workflow_run
           # You can take advantage of the `workflow_run` event payload to generate a unique name for the exported logs:
-          s3-key: ${{ github.event.workflow_run.name }}/${{ github.event.workflow_run.id }}.zip
+          s3-key: ${{ github.event.workflow_run.name }}/${{ github.event.workflow_run.created_at }}-runId-${{ github.event.workflow_run.id }}.zip
 ```
 
 ## Usage
 
 Workflow run logs can only be downloaded on completion of that workflow. To export workflow logs, you will have to run this action in a separate workflow that runs after the conclusion of an upstream workflow (see the [`workflow_run`](https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#workflow_run) event). Attempting to export the workflow run logs of an in-progress workflow will result in a 404 error from the GitHub API.
+
+### Environment Variables
+
+This Action only supports one environment variable: set `DEBUG` to `true` to enable more verbose logging from the Action. The same behavior can be achieved by enabling [workflow debug logging](https://docs.github.com/en/actions/monitoring-and-troubleshooting-workflows/enabling-debug-logging).
+
+### Inputs
 
 The following inputs are required regardless of the chosen destination:
 
@@ -58,9 +65,7 @@ The following inputs are required regardless of the chosen destination:
 | - | - |
 | `repo-token` | Token to use to fetch workflow logs. Typically the `GITHUB_TOKEN` secret. |
 | `run-id` | The workflow run ID for which to export logs. Typically obtained via the `github` context per the above example. |
-| `destination` | The service to export workflow logs to. Supported values: `s3` |
-
-Further inputs are required and they are dependent on the intended destination of the workflow logs.
+| `destination` | The service to export workflow logs to. Supported values: [`s3`](#amazon-s3), [`blobstorage`](#azure-blob-storage) |
 
 ### [Amazon S3](https://aws.amazon.com/s3/)
 
@@ -74,6 +79,18 @@ The following inputs are required if `destination` is `s3`:
 | `aws-region` | Region of the S3 bucket to upload to. Example: `us-east-1`
 | `s3-bucket-name` | Name of the S3 bucket to upload to
 | `s3-key` | S3 key to save the workflow logs to
+
+### [Azure Blob Storage](https://azure.microsoft.com/en-us/products/storage/blobs/)
+
+The Blob Storage exporter uses the `UploadBuffer` API to save the workflow logs file.
+
+The following inputs are required if `destination` is `blobstorage`:
+| Name | Description |
+| - | - |
+| `azure-storage-account-name` | Azure Storage Account name |
+| `azure-storage-account-key` | Access key for the Storage Account |
+| `container-name` | The name of the Blob Storage Container to upload to |
+| `blob-name` | Blob name to save the workflow logs as |
 
 ## Development
 

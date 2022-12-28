@@ -9,9 +9,9 @@ import (
 )
 
 var (
-	inputRepoTokenPtr     *string = flag.String(inputKeyRepoToken, "", "GITHUB_TOKEN or a Personal Access Token")
-	inputWorkflowRunIDPtr *int64  = flag.Int64(inputKeyWorkflowRunID, 0, "GitHub Actions Workflow Run ID")
-	inputDestination      *string = flag.String(inputKeyDestination, "", "The service to export workflow logs to")
+	inputRepoToken     *string = flag.String(inputKeyRepoToken, "", "GITHUB_TOKEN or a Personal Access Token")
+	inputWorkflowRunID *int64  = flag.Int64(inputKeyWorkflowRunID, 0, "GitHub Actions Workflow Run ID")
+	inputDestination   *string = flag.String(inputKeyDestination, "", "The service to export workflow logs to")
 
 	// Required inputs for S3
 
@@ -20,11 +20,17 @@ var (
 	inputAWSRegion          *string = flag.String(inputKeyAWSRegion, "us-east-1", "AWS Region for the S3 bucket")
 	inputS3BucketName       *string = flag.String(inputKeyS3BucketName, "", "S3 bucket name")
 	inputS3Key              *string = flag.String(inputKeyS3Key, "", "S3 key")
+
+	// Required inputs for Azure Blob Storage
+
+	inputAzureStorageAccountName *string = flag.String(inputKeyAzureStorageAccountName, "", "Storage account name")
+	inputAzureStorageAccountKey  *string = flag.String(inputKeyAzureStorageAccountKey, "", "Storage account key")
+	inputContainerName           *string = flag.String(inputKeyContainerName, "", "Azure blob storage container name")
+	inputBlobName                *string = flag.String(inputKeyBlobName, "", "Azure blob name")
 )
 
-// Validates input combinations that cannot be checked at the action-level.
-// In particular, ensures that the destination is valid and any other inputs
-// required for that destination are present.
+// validateActionInputs validates input combinations that cannot be checked at the action-level.
+// In particular, ensures that the destination is valid and any other inputs required for that destination are present.
 func validateActionInputs() error {
 	var matchedDestination string
 	for _, destination := range supportedDestinations {
@@ -42,22 +48,34 @@ func validateActionInputs() error {
 		)
 	}
 
+	var inputFlagsToAssertNotEmpty map[string]string
 	if matchedDestination == "s3" {
 		log.Debug().Msg("Validating Action inputs for S3")
-		inputFlagsToAssertNotEmpty := map[string]string{
+		inputFlagsToAssertNotEmpty = map[string]string{
 			inputKeyAWSAccessKeyID:     *inputAWSAccessKeyID,
 			inputKeyAWSSecretAccessKey: *inputAWSSecretAccessKey,
 			inputKeyAWSRegion:          *inputAWSRegion,
 			inputKeyS3BucketName:       *inputS3BucketName,
 			inputKeyS3Key:              *inputS3Key,
 		}
-		for inputName, inputValue := range inputFlagsToAssertNotEmpty {
-			if len(inputValue) == 0 {
-				return fmt.Errorf("the input '%s' is required", inputName)
-			}
-		}
-		log.Debug().Msg("Action input validation for S3 was successful")
 	}
 
+	if matchedDestination == "blobstorage" {
+		log.Debug().Msg("Validating Action inputs for Blob Storage")
+		inputFlagsToAssertNotEmpty = map[string]string{
+			inputKeyAzureStorageAccountName: *inputAzureStorageAccountName,
+			inputKeyAzureStorageAccountKey:  *inputAzureStorageAccountKey,
+			inputKeyContainerName:           *inputContainerName,
+			inputKeyBlobName:                *inputBlobName,
+		}
+	}
+
+	for inputName, inputValue := range inputFlagsToAssertNotEmpty {
+		if len(inputValue) == 0 {
+			return fmt.Errorf("the input '%s' is required", inputName)
+		}
+	}
+
+	log.Debug().Msg("Action input validation was successful")
 	return nil
 }

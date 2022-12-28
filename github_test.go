@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"net/http"
 	"testing"
 
@@ -24,7 +25,7 @@ func TestGetWorkflowRunLogsURLForRunID(t *testing.T) {
 	)
 	testClient := github.NewClient(mockedHTTPClient)
 
-	url, err := getWorkflowRunLogsURLForRunID(testClient, 123)
+	url, err := getWorkflowRunLogsURLForRunID(context.Background(), testClient, 123)
 
 	if err != nil {
 		t.Fatal(err)

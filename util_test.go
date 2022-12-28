@@ -1,34 +1,26 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"strings"
 	"testing"
 )
 
-func TestDownloadFileByURL(t *testing.T) {
-	t.Setenv(envVarGitHubWorkspace, t.TempDir())
-	testFileContents := "someFileContents"
+func TestGetResponseBodyByURL(t *testing.T) {
+	testFileContents := strings.Repeat("A", 1024*1024) // 1MB
 
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, testFileContents)
+		w.Write([]byte(testFileContents))
 	}))
 	defer ts.Close()
 
-	pathToSavedFile, err := downloadFileByURL(ts.URL)
+	buf, err := getResponseBodyByURL(ts.URL)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	contents, err := os.ReadFile(pathToSavedFile)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if strings.TrimSpace(string(contents)) != testFileContents {
+	if strings.TrimSpace(buf.String()) != testFileContents {
 		t.Fatal("File contents did not match expected test file contents")
 	}
 }

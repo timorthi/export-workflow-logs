@@ -50,6 +50,28 @@ func TestValidateActionInputs(t *testing.T) {
 				inputKeyS3Key: "some/key",
 			},
 		},
+		{
+			desc:          "Blob Storage destination success case",
+			shouldSucceed: true,
+			inputValuesByKey: map[string]string{
+				inputKeyDestination:             "blobstorage",
+				inputKeyAzureStorageAccountName: "mystorageaccount",
+				inputKeyAzureStorageAccountKey:  "myaccesskey",
+				inputKeyContainerName:           "my-container",
+				inputKeyBlobName:                "logs.zip",
+			},
+		},
+		{
+			desc:          "Blob Storage destination failure case",
+			shouldSucceed: false,
+			inputValuesByKey: map[string]string{
+				inputKeyDestination:             "blobstorage",
+				inputKeyAzureStorageAccountName: "mystorageaccount",
+				// inputKeyAzureStorageAccountKey intentionally excluded
+				inputKeyContainerName: "my-container",
+				inputKeyBlobName:      "logs.zip",
+			},
+		},
 	}
 
 	for _, tC := range testCases {

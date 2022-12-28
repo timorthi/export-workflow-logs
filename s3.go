@@ -1,14 +1,15 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"os"
-	"path"
 
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
 
+// S3PutObjectAPI represents the AWS SDK PutObject call
 type S3PutObjectAPI interface {
 	PutObject(ctx context.Context, params *s3.PutObjectInput, optFns ...func(*s3.Options)) (*s3.PutObjectOutput, error)
 }
@@ -26,20 +27,20 @@ func s3Client() (*s3.Client, error) {
 	return s3Client, nil
 }
 
-func saveToS3(ctx context.Context, api S3PutObjectAPI, bucket string, key string, pathToLogsFile string) error {
-	logsFile, err := os.Open(pathToLogsFile)
-	if err != nil {
-		return err
-	}
-	defer logsFile.Close()
-	defer os.RemoveAll(path.Dir(pathToLogsFile))
+// PutObjectParams contains the required params to make a PutObject call
+type PutObjectParams struct {
+	Bucket   string
+	Key      string
+	Contents *bytes.Buffer
+}
 
-	putObjectInput := s3.PutObjectInput{
-		Bucket: &bucket,
-		Key:    &key,
-		Body:   logsFile,
-	}
-	_, err = api.PutObject(ctx, &putObjectInput)
+// saveToS3 makes an S3 PutObject call
+func saveToS3(ctx context.Context, api S3PutObjectAPI, putObjectParams PutObjectParams) error {
+	_, err := api.PutObject(ctx, &s3.PutObjectInput{
+		Bucket: &putObjectParams.Bucket,
+		Key:    &putObjectParams.Key,
+		Body:   putObjectParams.Contents,
+	})
 	if err != nil {
 		return err
 	}
