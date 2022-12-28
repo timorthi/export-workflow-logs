@@ -44,8 +44,9 @@ jobs:
           aws-secret-access-key: ${{ secrets. AWS_SECRET_ACCESS_KEY }}
           aws-region: us-west-1
           s3-bucket-name: my-workflow-logs
+          # https://docs.github.com/developers/webhooks-and-events/webhooks/webhook-events-and-payloads?actionType=requested#workflow_run
           # You can take advantage of the `workflow_run` event payload to generate a unique name for the exported logs:
-          s3-key: ${{ github.event.workflow_run.name }}/${{ github.event.workflow_run.id }}.zip
+          s3-key: ${{ github.event.workflow_run.name }}/${{ github.event.workflow_run.created_at }}-runId-${{ github.event.workflow_run.id }}.zip
 ```
 
 ## Usage
