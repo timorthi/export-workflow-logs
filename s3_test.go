@@ -44,7 +44,7 @@ func TestSaveToS3(t *testing.T) {
 		return &s3.PutObjectOutput{}, nil
 	})
 
-	err := saveToS3(ctx, testAPI, bytes.NewBuffer(contentsBuf), PutObjectParams{Bucket: testBucket, Key: testKey})
+	err := saveToS3(ctx, testAPI, PutObjectParams{Bucket: testBucket, Key: testKey, Contents: bytes.NewBuffer(contentsBuf)})
 	if err != nil {
 		t.Fatal(err)
 	}
