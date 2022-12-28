@@ -12,7 +12,7 @@ import (
 
 func githubClient(ctx context.Context) (*github.Client, error) {
 	ts := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: *inputRepoTokenPtr},
+		&oauth2.Token{AccessToken: *inputRepoToken},
 	)
 	tc := oauth2.NewClient(ctx, ts)
 

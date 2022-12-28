@@ -34,7 +34,7 @@ func main() {
 	}
 	log.Info().Msg("Validated Action inputs")
 
-	workflowRunID := *inputWorkflowRunIDPtr
+	workflowRunID := *inputWorkflowRunID
 	log.Debug().Int64("workflowRunID", workflowRunID).Msg("Attempting to get workflow run logs URL via GitHub API")
 	client, err := githubClient(ctx)
 	if err != nil {

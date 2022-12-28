@@ -9,9 +9,9 @@ import (
 )
 
 var (
-	inputRepoTokenPtr     *string = flag.String(inputKeyRepoToken, "", "GITHUB_TOKEN or a Personal Access Token")
-	inputWorkflowRunIDPtr *int64  = flag.Int64(inputKeyWorkflowRunID, 0, "GitHub Actions Workflow Run ID")
-	inputDestination      *string = flag.String(inputKeyDestination, "", "The service to export workflow logs to")
+	inputRepoToken     *string = flag.String(inputKeyRepoToken, "", "GITHUB_TOKEN or a Personal Access Token")
+	inputWorkflowRunID *int64  = flag.Int64(inputKeyWorkflowRunID, 0, "GitHub Actions Workflow Run ID")
+	inputDestination   *string = flag.String(inputKeyDestination, "", "The service to export workflow logs to")
 
 	// Required inputs for S3
 
