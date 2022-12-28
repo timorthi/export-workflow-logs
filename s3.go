@@ -26,12 +26,14 @@ func s3Client() (*s3.Client, error) {
 	return s3Client, nil
 }
 
+// Required params to make PutObject call
 type PutObjectParams struct {
 	Bucket   string
 	Key      string
 	Contents *bytes.Buffer
 }
 
+// Makes an S3 PutObject call
 func saveToS3(ctx context.Context, api S3PutObjectAPI, putObjectParams PutObjectParams) error {
 	_, err := api.PutObject(ctx, &s3.PutObjectInput{
 		Bucket: &putObjectParams.Bucket,
