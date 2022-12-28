@@ -53,6 +53,12 @@ jobs:
 
 Workflow run logs can only be downloaded on completion of that workflow. To export workflow logs, you will have to run this action in a separate workflow that runs after the conclusion of an upstream workflow (see the [`workflow_run`](https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#workflow_run) event). Attempting to export the workflow run logs of an in-progress workflow will result in a 404 error from the GitHub API.
 
+### Environment Variables
+
+This Action only supports one environment variable: set `DEBUG` to `true` to enable more verbose logging from the Action. The same behavior can be achieved by enabling [workflow debug logging](https://docs.github.com/en/actions/monitoring-and-troubleshooting-workflows/enabling-debug-logging).
+
+### Inputs
+
 The following inputs are required regardless of the chosen destination:
 
 | Name | Description |
