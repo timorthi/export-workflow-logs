@@ -66,11 +66,11 @@ func main() {
 		if err != nil {
 			log.Fatal().Err(err).Msg("Error initializing S3 client")
 		}
-		params := PutObjectParams{
-			Bucket: *inputS3BucketName,
-			Key:    *inputS3Key,
-		}
-		err = saveToS3(ctx, s3Client, workflowRunLogs, params)
+		err = saveToS3(ctx, s3Client, PutObjectParams{
+			Bucket:   *inputS3BucketName,
+			Key:      *inputS3Key,
+			Contents: workflowRunLogs,
+		})
 		if err != nil {
 			log.Fatal().Err(err).Msg("Error uploading workflow logs to S3")
 		}
