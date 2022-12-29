@@ -3,11 +3,13 @@ package main
 import (
 	"bytes"
 	"context"
+	"errors"
 	"io"
 	"strings"
 	"testing"
 
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/stretchr/testify/assert"
 )
 
 type mockPutObjectAPI func(ctx context.Context, params *s3.PutObjectInput, optFns ...func(*s3.Options)) (*s3.PutObjectOutput, error)
@@ -23,29 +25,49 @@ func TestSaveToS3(t *testing.T) {
 
 	testBucket := "testBucketName"
 	testKey := "some/key/to/logs.zip"
+	testParams := PutObjectParams{Bucket: testBucket, Key: testKey, Contents: bytes.NewBuffer(contentsBuf)}
 
-	testAPI := mockPutObjectAPI(func(ctx context.Context, params *s3.PutObjectInput, optFns ...func(*s3.Options)) (*s3.PutObjectOutput, error) {
-		t.Helper()
+	testCases := []struct {
+		desc          string
+		shouldSucceed bool
+		want          string
+		mockAPI       mockPutObjectAPI
+	}{
+		{
+			desc:          "Successful PutObject call",
+			shouldSucceed: true,
+			want:          "",
+			mockAPI: mockPutObjectAPI(
+				func(ctx context.Context, params *s3.PutObjectInput, optFns ...func(*s3.Options)) (*s3.PutObjectOutput, error) {
+					// Assertions to test the params given to the S3 client
+					assert.Equal(t, *params.Key, testKey)
+					assert.Equal(t, *params.Bucket, testBucket)
+					buf := new(strings.Builder)
+					io.Copy(buf, params.Body)
+					assert.Equal(t, buf.String(), testContents)
+					return &s3.PutObjectOutput{}, nil
+				}),
+		},
+		{
+			desc:          "Failed PutObject call",
+			shouldSucceed: false,
+			want:          "oh no!",
+			mockAPI: mockPutObjectAPI(
+				func(ctx context.Context, params *s3.PutObjectInput, optFns ...func(*s3.Options)) (*s3.PutObjectOutput, error) {
+					return nil, errors.New("oh no!")
+				}),
+		},
+	}
 
-		// Assertions to test the params given to the S3 client
-		if *params.Key != testKey {
-			t.Fatalf("expected supplied key to be %s but got %s", testKey, *params.Key)
-		}
-		if *params.Bucket != testBucket {
-			t.Fatalf("expected supplied bucket to be %s but got %s", testBucket, *params.Bucket)
-		}
+	for _, tC := range testCases {
+		t.Run(tC.desc, func(t *testing.T) {
+			err := saveToS3(ctx, tC.mockAPI, testParams)
 
-		buf := new(strings.Builder)
-		io.Copy(buf, params.Body)
-		if buf.String() != testContents {
-			t.Fatalf("unexpected file contents: '%s'", buf.String())
-		}
-
-		return &s3.PutObjectOutput{}, nil
-	})
-
-	err := saveToS3(ctx, testAPI, PutObjectParams{Bucket: testBucket, Key: testKey, Contents: bytes.NewBuffer(contentsBuf)})
-	if err != nil {
-		t.Fatal(err)
+			if tC.shouldSucceed {
+				assert.NoError(t, err)
+			} else {
+				assert.ErrorContains(t, err, tC.want)
+			}
+		})
 	}
 }

@@ -3,9 +3,11 @@ package main
 import (
 	"bytes"
 	"context"
+	"errors"
 	"testing"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
+	"github.com/stretchr/testify/assert"
 )
 
 type mockUploadBufferAPI func(ctx context.Context, containerName string, blobName string, buffer []byte, o *azblob.UploadBufferOptions) (azblob.UploadBufferResponse, error)
@@ -15,6 +17,7 @@ func (m mockUploadBufferAPI) UploadBuffer(ctx context.Context, containerName str
 }
 
 func TestSaveToBlobStorage(t *testing.T) {
+	ctx := context.Background()
 	testContents := "hello world!"
 	testParams := UploadBufferParams{
 		ContainerName: "mytestcontainer",
@@ -22,26 +25,44 @@ func TestSaveToBlobStorage(t *testing.T) {
 		Contents:      bytes.NewBuffer([]byte(testContents)),
 	}
 
-	testAPI := mockUploadBufferAPI(func(ctx context.Context, containerName string, blobName string, buffer []byte, o *azblob.UploadBufferOptions) (azblob.UploadBufferResponse, error) {
-		t.Helper()
+	testCases := []struct {
+		desc          string
+		shouldSucceed bool
+		want          string
+		mockAPI       mockUploadBufferAPI
+	}{
+		{
+			desc:          "Successful UploadBuffer call",
+			shouldSucceed: true,
+			want:          "",
+			mockAPI: mockUploadBufferAPI(
+				func(ctx context.Context, containerName string, blobName string, buffer []byte, o *azblob.UploadBufferOptions) (azblob.UploadBufferResponse, error) {
+					assert.Equal(t, containerName, testParams.ContainerName)
+					assert.Equal(t, blobName, testParams.BlobName)
+					assert.Equal(t, string(buffer), testContents)
+					return azblob.UploadBufferResponse{}, nil
+				}),
+		},
+		{
+			desc:          "Failed UploadBuffer call",
+			shouldSucceed: false,
+			want:          "some error",
+			mockAPI: mockUploadBufferAPI(
+				func(ctx context.Context, containerName string, blobName string, buffer []byte, o *azblob.UploadBufferOptions) (azblob.UploadBufferResponse, error) {
+					return azblob.UploadBufferResponse{}, errors.New("some error")
+				}),
+		},
+	}
 
-		if containerName != testParams.ContainerName {
-			t.Fatalf("expected supplied container name to be %s, got %s", testParams.ContainerName, containerName)
-		}
+	for _, tC := range testCases {
+		t.Run(tC.desc, func(t *testing.T) {
+			err := saveToBlobStorage(ctx, tC.mockAPI, testParams)
 
-		if blobName != testParams.BlobName {
-			t.Fatalf("expected supplied blob name to be %s, got %s", testParams.BlobName, blobName)
-		}
-
-		if string(buffer) != testContents {
-			t.Fatalf("unexpected file contents: '%s'", string(buffer))
-		}
-
-		return azblob.UploadBufferResponse{}, nil
-	})
-
-	err := saveToBlobStorage(context.Background(), testAPI, testParams)
-	if err != nil {
-		t.Fatal(err)
+			if tC.shouldSucceed {
+				assert.NoError(t, err)
+			} else {
+				assert.ErrorContains(t, err, tC.want)
+			}
+		})
 	}
 }
