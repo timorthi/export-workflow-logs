@@ -5,6 +5,8 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestGetResponseBodyByURL(t *testing.T) {
@@ -16,13 +18,9 @@ func TestGetResponseBodyByURL(t *testing.T) {
 	defer ts.Close()
 
 	buf, err := getResponseBodyByURL(ts.URL)
-	if err != nil {
-		t.Fatal(err)
-	}
 
-	if strings.TrimSpace(buf.String()) != testFileContents {
-		t.Fatal("File contents did not match expected test file contents")
-	}
+	assert.NoError(t, err)
+	assert.Equal(t, strings.TrimSpace(buf.String()), testFileContents)
 }
 
 func TestGetRequiredEnv(t *testing.T) {
@@ -30,31 +28,35 @@ func TestGetRequiredEnv(t *testing.T) {
 		desc             string
 		envVarNameToTest string
 		shouldSucceed    bool
+		want             string
 	}{
 		{
 			desc:             "Returns env vars that are set",
 			envVarNameToTest: "foo",
 			shouldSucceed:    false,
+			want:             "env var 'foo' does not exist",
 		},
 		{
 			desc:             "Errors when an env var is not set",
 			envVarNameToTest: "bar",
 			shouldSucceed:    true,
+			want:             "barValue",
 		},
 	}
 
 	for _, tC := range testCases {
 		t.Run(tC.desc, func(t *testing.T) {
 			if tC.shouldSucceed {
-				t.Setenv(tC.envVarNameToTest, "someNonemptyValue")
+				t.Setenv(tC.envVarNameToTest, tC.want)
 			}
 
 			val, err := getRequiredEnv(tC.envVarNameToTest)
 
-			if tC.shouldSucceed && (err != nil) {
-				t.Fatalf("expected '%s' to exist but error was returned: %v", tC.envVarNameToTest, err)
-			} else if !tC.shouldSucceed && (val != "") {
-				t.Fatalf("expected '%s' to error but a value was returned: %s", tC.envVarNameToTest, val)
+			if tC.shouldSucceed {
+				assert.NoError(t, err)
+				assert.Equal(t, val, tC.want)
+			} else {
+				assert.ErrorContains(t, err, tC.want)
 			}
 		})
 	}

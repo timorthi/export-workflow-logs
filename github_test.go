@@ -7,6 +7,7 @@ import (
 
 	"github.com/google/go-github/v48/github"
 	"github.com/migueleliasweb/go-github-mock/src/mock"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestGetWorkflowRunLogsURLForRunID(t *testing.T) {
@@ -26,12 +27,6 @@ func TestGetWorkflowRunLogsURLForRunID(t *testing.T) {
 	testClient := github.NewClient(mockedHTTPClient)
 
 	url, err := getWorkflowRunLogsURLForRunID(context.Background(), testClient, 123)
-
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if url.String() != testURL {
-		t.Fatalf("Expected url to equal '%s' but got: '%s'", testURL, url.String())
-	}
+	assert.NoError(t, err)
+	assert.Equal(t, url.String(), testURL)
 }

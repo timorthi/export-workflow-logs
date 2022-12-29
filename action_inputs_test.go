@@ -2,7 +2,10 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestValidateActionInputsErrorOnInvalidDestination(t *testing.T) {
@@ -10,9 +13,7 @@ func TestValidateActionInputsErrorOnInvalidDestination(t *testing.T) {
 	defer flag.Set(inputKeyDestination, "")
 
 	err := validateActionInputs()
-	if err == nil {
-		t.Error("Expected validateActionInputs to return error, got nil")
-	}
+	assert.ErrorContains(t, err, "supplied destination someUnsupportedDestination is invalid")
 }
 
 func TestValidateActionInputs(t *testing.T) {
@@ -25,6 +26,7 @@ func TestValidateActionInputs(t *testing.T) {
 		desc             string
 		shouldSucceed    bool
 		inputValuesByKey map[string]string
+		want             string
 	}{
 		{
 			desc:          "S3 destination success case",
@@ -37,6 +39,7 @@ func TestValidateActionInputs(t *testing.T) {
 				inputKeyS3BucketName:       "my-bucket",
 				inputKeyS3Key:              "some/key",
 			},
+			want: "",
 		},
 		{
 			desc:          "S3 destination failure case",
@@ -49,6 +52,7 @@ func TestValidateActionInputs(t *testing.T) {
 				// inputKeyS3BucketName intentionally excluded
 				inputKeyS3Key: "some/key",
 			},
+			want: inputKeyS3BucketName,
 		},
 		{
 			desc:          "Blob Storage destination success case",
@@ -60,6 +64,7 @@ func TestValidateActionInputs(t *testing.T) {
 				inputKeyContainerName:           "my-container",
 				inputKeyBlobName:                "logs.zip",
 			},
+			want: "",
 		},
 		{
 			desc:          "Blob Storage destination failure case",
@@ -71,6 +76,7 @@ func TestValidateActionInputs(t *testing.T) {
 				inputKeyContainerName: "my-container",
 				inputKeyBlobName:      "logs.zip",
 			},
+			want: inputKeyAzureStorageAccountKey,
 		},
 	}
 
@@ -82,10 +88,10 @@ func TestValidateActionInputs(t *testing.T) {
 			}
 
 			err := validateActionInputs()
-			if tC.shouldSucceed && err != nil {
-				t.Errorf("Expected validateActionInputs to return nil, got error: %v", err)
-			} else if !tC.shouldSucceed && err == nil {
-				t.Error("Expected validateActionInputs to error, but it succeeded")
+			if tC.shouldSucceed {
+				assert.NoError(t, err)
+			} else {
+				assert.ErrorContains(t, err, fmt.Sprintf("the input '%s' is required", tC.want))
 			}
 		})
 	}
