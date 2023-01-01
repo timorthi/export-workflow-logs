@@ -27,6 +27,11 @@ const (
 	inputKeyBlobName                string = "blob-name"
 )
 
+const (
+	AmazonS3Destination         string = "s3"
+	AzureBlobStorageDestination string = "blobstorage"
+)
+
 var (
-	supportedDestinations = []string{"s3", "blobstorage"}
+	supportedDestinations = []string{AmazonS3Destination, AzureBlobStorageDestination}
 )
