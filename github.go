@@ -37,7 +37,7 @@ func getWorkflowRunLogsURLForRunID(ctx context.Context, client *github.Client, w
 	if err != nil {
 		return nil, err
 	}
-	repoFullName, err := getRequiredEnv(envVarRepoFullName)
+	repoFullName, err := getRequiredEnv(envVarRepoFullName) // repoFullName is expected to be in the form: username/repoName
 	if err != nil {
 		return nil, err
 	}
