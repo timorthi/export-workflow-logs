@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"sort"
 	"strings"
 
 	"github.com/rs/zerolog/log"
@@ -123,6 +124,7 @@ func validateActionInputs() (ActionInputs, error) {
 		}
 	}
 	if len(emptyInputs) > 0 {
+		sort.Strings(emptyInputs)
 		return ActionInputs{}, fmt.Errorf("the following inputs are required: %s", strings.Join(emptyInputs, ", "))
 	}
 
