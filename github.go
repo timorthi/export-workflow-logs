@@ -10,9 +10,9 @@ import (
 	"golang.org/x/oauth2"
 )
 
-func githubClient(ctx context.Context) (*github.Client, error) {
+func githubClient(ctx context.Context, accessToken string) (*github.Client, error) {
 	ts := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: *inputRepoToken},
+		&oauth2.Token{AccessToken: accessToken},
 	)
 	tc := oauth2.NewClient(ctx, ts)
 
@@ -23,11 +23,11 @@ func githubClient(ctx context.Context) (*github.Client, error) {
 
 	if serverURL != githubDefaultBaseURL {
 		log.Debug().Str("serverURL", serverURL).
-			Msgf("Detected a non-default GITHUB_SERVER_URL value. Using GitHub Enterprise Client.")
+			Msg("Detected a non-default GITHUB_SERVER_URL value. Using GitHub Enterprise Client")
 		return github.NewEnterpriseClient(serverURL, serverURL, tc)
 	}
 
-	log.Debug().Msg("Using regular GitHub client.")
+	log.Debug().Msg("Using regular GitHub client")
 	return github.NewClient(tc), nil
 }
 
@@ -37,7 +37,7 @@ func getWorkflowRunLogsURLForRunID(ctx context.Context, client *github.Client, w
 	if err != nil {
 		return nil, err
 	}
-	repoFullName, err := getRequiredEnv(envVarRepoFullName)
+	repoFullName, err := getRequiredEnv(envVarRepoFullName) // repoFullName is expected to be in the form: username/repoName
 	if err != nil {
 		return nil, err
 	}

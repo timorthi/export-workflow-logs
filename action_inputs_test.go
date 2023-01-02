@@ -8,14 +8,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestValidateActionInputsErrorOnInvalidDestination(t *testing.T) {
-	flag.Set(inputKeyDestination, "someUnsupportedDestination")
-	defer flag.Set(inputKeyDestination, "")
-
-	err := validateActionInputs()
-	assert.ErrorContains(t, err, "supplied destination someUnsupportedDestination is invalid")
-}
-
 func TestValidateActionInputs(t *testing.T) {
 	flag.Set(inputKeyRepoToken, "testRepoToken")
 	flag.Set(inputKeyWorkflowRunID, "123")
@@ -26,8 +18,18 @@ func TestValidateActionInputs(t *testing.T) {
 		desc             string
 		shouldSucceed    bool
 		inputValuesByKey map[string]string
-		want             string
+		wantResult       ActionInputs
+		wantError        string
 	}{
+		{
+			desc:          "Invalid destination",
+			shouldSucceed: false,
+			inputValuesByKey: map[string]string{
+				inputKeyDestination: "someUnsupportedDestination",
+			},
+			wantResult: ActionInputs{},
+			wantError:  "supplied destination someUnsupportedDestination is invalid",
+		},
 		{
 			desc:          "S3 destination success case",
 			shouldSucceed: true,
@@ -39,7 +41,20 @@ func TestValidateActionInputs(t *testing.T) {
 				inputKeyS3BucketName:       "my-bucket",
 				inputKeyS3Key:              "some/key",
 			},
-			want: "",
+			wantResult: ActionInputs{
+				repoToken:         "testRepoToken",
+				workflowRunID:     123,
+				destination:       "s3",
+				blobStorageInputs: nil,
+				s3Inputs: &S3ActionInputs{
+					awsAccessKeyID:     "abc",
+					awsSecretAccessKey: "abc",
+					awsRegion:          "someregion",
+					bucketName:         "my-bucket",
+					key:                "some/key",
+				},
+			},
+			wantError: "",
 		},
 		{
 			desc:          "S3 destination failure case",
@@ -48,11 +63,12 @@ func TestValidateActionInputs(t *testing.T) {
 				inputKeyDestination:        "s3",
 				inputKeyAWSAccessKeyID:     "abc",
 				inputKeyAWSSecretAccessKey: "abc",
-				inputKeyAWSRegion:          "someregion",
+				// inputKeyAWSRegion intentionally excluded
 				// inputKeyS3BucketName intentionally excluded
 				inputKeyS3Key: "some/key",
 			},
-			want: inputKeyS3BucketName,
+			wantResult: ActionInputs{},
+			wantError:  fmt.Sprintf("the following inputs are required: %s, %s", inputKeyAWSRegion, inputKeyS3BucketName),
 		},
 		{
 			desc:          "Blob Storage destination success case",
@@ -64,7 +80,19 @@ func TestValidateActionInputs(t *testing.T) {
 				inputKeyContainerName:           "my-container",
 				inputKeyBlobName:                "logs.zip",
 			},
-			want: "",
+			wantResult: ActionInputs{
+				repoToken:     "testRepoToken",
+				workflowRunID: 123,
+				destination:   "blobstorage",
+				s3Inputs:      nil,
+				blobStorageInputs: &BlobStorageActionInputs{
+					storageAccountName: "mystorageaccount",
+					storageAccountKey:  "myaccesskey",
+					containerName:      "my-container",
+					blobName:           "logs.zip",
+				},
+			},
+			wantError: "",
 		},
 		{
 			desc:          "Blob Storage destination failure case",
@@ -76,7 +104,8 @@ func TestValidateActionInputs(t *testing.T) {
 				inputKeyContainerName: "my-container",
 				inputKeyBlobName:      "logs.zip",
 			},
-			want: inputKeyAzureStorageAccountKey,
+			wantResult: ActionInputs{},
+			wantError:  fmt.Sprintf("the following inputs are required: %s", inputKeyAzureStorageAccountKey),
 		},
 	}
 
@@ -87,11 +116,12 @@ func TestValidateActionInputs(t *testing.T) {
 				defer flag.Set(key, "") // Clean up flags by "unsetting" them after this test
 			}
 
-			err := validateActionInputs()
+			inputs, err := validateActionInputs()
+			assert.Equal(t, inputs, tC.wantResult)
 			if tC.shouldSucceed {
 				assert.NoError(t, err)
 			} else {
-				assert.ErrorContains(t, err, fmt.Sprintf("the input '%s' is required", tC.want))
+				assert.ErrorContains(t, err, tC.wantError)
 			}
 		})
 	}
