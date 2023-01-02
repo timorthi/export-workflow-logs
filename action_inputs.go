@@ -29,9 +29,32 @@ var (
 	inputBlobName                *string = flag.String(inputKeyBlobName, "", "Azure blob name")
 )
 
+type S3ActionInputs struct {
+	awsAccessKeyID     string
+	awsSecretAccessKey string
+	awsRegion          string
+	s3BucketName       string
+	s3Key              string
+}
+
+type BlobStorageActionInputs struct {
+	azureStorageAccountName string
+	azureStorageAccountKey  string
+	containerName           string
+	blobName                string
+}
+
+type ActionInputs struct {
+	repoToken         string
+	workflowRunID     int64
+	destination       string
+	s3Inputs          *S3ActionInputs
+	blobStorageInputs *BlobStorageActionInputs
+}
+
 // validateActionInputs validates input combinations that cannot be checked at the action-level.
 // In particular, ensures that the destination is valid and any other inputs required for that destination are present.
-func validateActionInputs() error {
+func validateActionInputs() (ActionInputs, error) {
 	var matchedDestination string
 	for _, destination := range supportedDestinations {
 		if strings.EqualFold(destination, *inputDestination) {
@@ -41,7 +64,7 @@ func validateActionInputs() error {
 		}
 	}
 	if matchedDestination == "" {
-		return fmt.Errorf(
+		return ActionInputs{}, fmt.Errorf(
 			"supplied destination %s is invalid. Supported values are: %s",
 			*inputDestination,
 			strings.Join(supportedDestinations, ", "),
@@ -49,8 +72,18 @@ func validateActionInputs() error {
 	}
 
 	var inputFlagsToAssertNotEmpty map[string]string
-	if matchedDestination == "s3" {
+	var s3Inputs *S3ActionInputs
+	var blobStorageInputs *BlobStorageActionInputs
+
+	if matchedDestination == AmazonS3Destination {
 		log.Debug().Msg("Validating Action inputs for S3")
+		s3Inputs = &S3ActionInputs{
+			awsAccessKeyID:     *inputAWSAccessKeyID,
+			awsSecretAccessKey: *inputAWSSecretAccessKey,
+			awsRegion:          *inputAWSRegion,
+			s3BucketName:       *inputS3BucketName,
+			s3Key:              *inputS3Key,
+		}
 		inputFlagsToAssertNotEmpty = map[string]string{
 			inputKeyAWSAccessKeyID:     *inputAWSAccessKeyID,
 			inputKeyAWSSecretAccessKey: *inputAWSSecretAccessKey,
@@ -60,8 +93,14 @@ func validateActionInputs() error {
 		}
 	}
 
-	if matchedDestination == "blobstorage" {
+	if matchedDestination == AzureBlobStorageDestination {
 		log.Debug().Msg("Validating Action inputs for Blob Storage")
+		blobStorageInputs = &BlobStorageActionInputs{
+			azureStorageAccountName: *inputAzureStorageAccountName,
+			azureStorageAccountKey:  *inputAzureStorageAccountKey,
+			containerName:           *inputContainerName,
+			blobName:                *inputBlobName,
+		}
 		inputFlagsToAssertNotEmpty = map[string]string{
 			inputKeyAzureStorageAccountName: *inputAzureStorageAccountName,
 			inputKeyAzureStorageAccountKey:  *inputAzureStorageAccountKey,
@@ -72,10 +111,16 @@ func validateActionInputs() error {
 
 	for inputName, inputValue := range inputFlagsToAssertNotEmpty {
 		if len(inputValue) == 0 {
-			return fmt.Errorf("the input '%s' is required", inputName)
+			return ActionInputs{}, fmt.Errorf("the input '%s' is required", inputName)
 		}
 	}
 
 	log.Debug().Msg("Action input validation was successful")
-	return nil
+	return ActionInputs{
+		repoToken:         *inputRepoToken,
+		workflowRunID:     *inputWorkflowRunID,
+		destination:       matchedDestination,
+		s3Inputs:          s3Inputs,
+		blobStorageInputs: blobStorageInputs,
+	}, nil
 }

@@ -28,7 +28,7 @@ func main() {
 	ctx := context.Background()
 
 	log.Debug().Msg("Attempting to validate Action inputs")
-	err := validateActionInputs()
+	_, err := validateActionInputs()
 	if err != nil {
 		log.Fatal().Err(err).Msg("Error while validating Action inputs")
 	}
