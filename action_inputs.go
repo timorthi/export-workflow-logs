@@ -33,15 +33,15 @@ type S3ActionInputs struct {
 	awsAccessKeyID     string
 	awsSecretAccessKey string
 	awsRegion          string
-	s3BucketName       string
-	s3Key              string
+	bucketName         string
+	key                string
 }
 
 type BlobStorageActionInputs struct {
-	azureStorageAccountName string
-	azureStorageAccountKey  string
-	containerName           string
-	blobName                string
+	storageAccountName string
+	storageAccountKey  string
+	containerName      string
+	blobName           string
 }
 
 type ActionInputs struct {
@@ -81,8 +81,8 @@ func validateActionInputs() (ActionInputs, error) {
 			awsAccessKeyID:     *inputAWSAccessKeyID,
 			awsSecretAccessKey: *inputAWSSecretAccessKey,
 			awsRegion:          *inputAWSRegion,
-			s3BucketName:       *inputS3BucketName,
-			s3Key:              *inputS3Key,
+			bucketName:         *inputS3BucketName,
+			key:                *inputS3Key,
 		}
 		inputFlagsToAssertNotEmpty = map[string]string{
 			inputKeyAWSAccessKeyID:     *inputAWSAccessKeyID,
@@ -96,10 +96,10 @@ func validateActionInputs() (ActionInputs, error) {
 	if matchedDestination == AzureBlobStorageDestination {
 		log.Debug().Msg("Validating Action inputs for Blob Storage")
 		blobStorageInputs = &BlobStorageActionInputs{
-			azureStorageAccountName: *inputAzureStorageAccountName,
-			azureStorageAccountKey:  *inputAzureStorageAccountKey,
-			containerName:           *inputContainerName,
-			blobName:                *inputBlobName,
+			storageAccountName: *inputAzureStorageAccountName,
+			storageAccountKey:  *inputAzureStorageAccountKey,
+			containerName:      *inputContainerName,
+			blobName:           *inputBlobName,
 		}
 		inputFlagsToAssertNotEmpty = map[string]string{
 			inputKeyAzureStorageAccountName: *inputAzureStorageAccountName,
