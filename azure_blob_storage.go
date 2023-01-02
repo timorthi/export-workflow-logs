@@ -8,14 +8,19 @@ import (
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
 )
 
-func blobStorageClient() (*azblob.Client, error) {
-	storageAccountName := *inputAzureStorageAccountName
-	credential, err := azblob.NewSharedKeyCredential(storageAccountName, *inputAzureStorageAccountKey)
+// AzureStorageConfig is a struct containing the info needed to initialize a blob storage client
+type AzureStorageConfig struct {
+	storageAccountName string
+	storageAccountKey  string
+}
+
+func blobStorageClient(cfg AzureStorageConfig) (*azblob.Client, error) {
+	credential, err := azblob.NewSharedKeyCredential(cfg.storageAccountName, cfg.storageAccountKey)
 	if err != nil {
 		return nil, err
 	}
 
-	url := fmt.Sprintf("https://%s.blob.core.windows.net/", storageAccountName)
+	url := fmt.Sprintf("https://%s.blob.core.windows.net/", cfg.storageAccountName)
 
 	return azblob.NewClientWithSharedKeyCredential(url, credential, nil)
 }

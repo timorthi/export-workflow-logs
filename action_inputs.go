@@ -8,21 +8,24 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+// Required Action inputs
 var (
 	inputRepoToken     *string = flag.String(inputKeyRepoToken, "", "GITHUB_TOKEN or a Personal Access Token")
 	inputWorkflowRunID *int64  = flag.Int64(inputKeyWorkflowRunID, 0, "GitHub Actions Workflow Run ID")
 	inputDestination   *string = flag.String(inputKeyDestination, "", "The service to export workflow logs to")
+)
 
-	// Required inputs for S3
-
+// Required inputs for S3
+var (
 	inputAWSAccessKeyID     *string = flag.String(inputKeyAWSAccessKeyID, "", "AWS Access Key ID")
 	inputAWSSecretAccessKey *string = flag.String(inputKeyAWSSecretAccessKey, "", "AWS Secret Access Key")
 	inputAWSRegion          *string = flag.String(inputKeyAWSRegion, "us-east-1", "AWS Region for the S3 bucket")
 	inputS3BucketName       *string = flag.String(inputKeyS3BucketName, "", "S3 bucket name")
 	inputS3Key              *string = flag.String(inputKeyS3Key, "", "S3 key")
+)
 
-	// Required inputs for Azure Blob Storage
-
+// Required inputs for Azure Blob Storage
+var (
 	inputAzureStorageAccountName *string = flag.String(inputKeyAzureStorageAccountName, "", "Storage account name")
 	inputAzureStorageAccountKey  *string = flag.String(inputKeyAzureStorageAccountKey, "", "Storage account key")
 	inputContainerName           *string = flag.String(inputKeyContainerName, "", "Azure blob storage container name")
