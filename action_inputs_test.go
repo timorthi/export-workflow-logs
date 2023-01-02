@@ -63,12 +63,12 @@ func TestValidateActionInputs(t *testing.T) {
 				inputKeyDestination:        "s3",
 				inputKeyAWSAccessKeyID:     "abc",
 				inputKeyAWSSecretAccessKey: "abc",
-				inputKeyAWSRegion:          "someregion",
+				// inputKeyAWSRegion intentionally excluded
 				// inputKeyS3BucketName intentionally excluded
 				inputKeyS3Key: "some/key",
 			},
 			wantResult: ActionInputs{},
-			wantError:  fmt.Sprintf("the input '%s' is required", inputKeyS3BucketName),
+			wantError:  fmt.Sprintf("the following inputs are required: %s, %s", inputKeyAWSRegion, inputKeyS3BucketName),
 		},
 		{
 			desc:          "Blob Storage destination success case",
@@ -105,7 +105,7 @@ func TestValidateActionInputs(t *testing.T) {
 				inputKeyBlobName:      "logs.zip",
 			},
 			wantResult: ActionInputs{},
-			wantError:  fmt.Sprintf("the input '%s' is required", inputKeyAzureStorageAccountKey),
+			wantError:  fmt.Sprintf("the following inputs are required: %s", inputKeyAzureStorageAccountKey),
 		},
 	}
 

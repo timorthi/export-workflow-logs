@@ -112,10 +112,14 @@ func validateActionInputs() (ActionInputs, error) {
 		}
 	}
 
+	var emptyInputs []string
 	for inputName, inputValue := range inputFlagsToAssertNotEmpty {
 		if len(inputValue) == 0 {
-			return ActionInputs{}, fmt.Errorf("the input '%s' is required", inputName)
+			emptyInputs = append(emptyInputs, inputName)
 		}
+	}
+	if len(emptyInputs) > 0 {
+		return ActionInputs{}, fmt.Errorf("the following inputs are required: %s", strings.Join(emptyInputs, ", "))
 	}
 
 	log.Debug().Msg("Action input validation was successful")
