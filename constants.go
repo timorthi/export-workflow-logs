@@ -8,7 +8,6 @@ const (
 	envVarRunnerDebug     string = "RUNNER_DEBUG"
 	envVarDebug           string = "DEBUG"
 
-	tempFileName         string = "logs.zip"
 	githubDefaultBaseURL string = "https://github.com"
 
 	inputKeyRepoToken     string = "repo-token"
