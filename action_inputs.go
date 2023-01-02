@@ -32,6 +32,7 @@ var (
 	inputBlobName                *string = flag.String(inputKeyBlobName, "", "Azure blob name")
 )
 
+// S3ActionInputs contains inputs required for the `s3` destination
 type S3ActionInputs struct {
 	awsAccessKeyID     string
 	awsSecretAccessKey string
@@ -40,6 +41,7 @@ type S3ActionInputs struct {
 	key                string
 }
 
+// BlobStorageActionInputs contains inputs required for the `blobstorage` destination
 type BlobStorageActionInputs struct {
 	storageAccountName string
 	storageAccountKey  string
@@ -47,6 +49,8 @@ type BlobStorageActionInputs struct {
 	blobName           string
 }
 
+// ActionInputs contains all the pertinent inputs for this GitHub Action. For a given destination, its corresponding
+// struct field (e.g. s3Inputs for the `s3` destination) is assumed to be non-nil.
 type ActionInputs struct {
 	repoToken         string
 	workflowRunID     int64
