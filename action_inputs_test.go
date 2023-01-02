@@ -8,15 +8,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestValidateActionInputsErrorOnInvalidDestination(t *testing.T) {
-	flag.Set(inputKeyDestination, "someUnsupportedDestination")
-	defer flag.Set(inputKeyDestination, "")
-
-	inputs, err := validateActionInputs()
-	assert.Equal(t, inputs, ActionInputs{})
-	assert.ErrorContains(t, err, "supplied destination someUnsupportedDestination is invalid")
-}
-
 func TestValidateActionInputs(t *testing.T) {
 	flag.Set(inputKeyRepoToken, "testRepoToken")
 	flag.Set(inputKeyWorkflowRunID, "123")
@@ -30,6 +21,15 @@ func TestValidateActionInputs(t *testing.T) {
 		wantResult       ActionInputs
 		wantError        string
 	}{
+		{
+			desc:          "Invalid destination",
+			shouldSucceed: false,
+			inputValuesByKey: map[string]string{
+				inputKeyDestination: "someUnsupportedDestination",
+			},
+			wantResult: ActionInputs{},
+			wantError:  "supplied destination someUnsupportedDestination is invalid",
+		},
 		{
 			desc:          "S3 destination success case",
 			shouldSucceed: true,
@@ -68,7 +68,7 @@ func TestValidateActionInputs(t *testing.T) {
 				inputKeyS3Key: "some/key",
 			},
 			wantResult: ActionInputs{},
-			wantError:  inputKeyS3BucketName,
+			wantError:  fmt.Sprintf("the input '%s' is required", inputKeyS3BucketName),
 		},
 		{
 			desc:          "Blob Storage destination success case",
@@ -105,7 +105,7 @@ func TestValidateActionInputs(t *testing.T) {
 				inputKeyBlobName:      "logs.zip",
 			},
 			wantResult: ActionInputs{},
-			wantError:  inputKeyAzureStorageAccountKey,
+			wantError:  fmt.Sprintf("the input '%s' is required", inputKeyAzureStorageAccountKey),
 		},
 	}
 
@@ -121,7 +121,7 @@ func TestValidateActionInputs(t *testing.T) {
 			if tC.shouldSucceed {
 				assert.NoError(t, err)
 			} else {
-				assert.ErrorContains(t, err, fmt.Sprintf("the input '%s' is required", tC.wantError))
+				assert.ErrorContains(t, err, tC.wantError)
 			}
 		})
 	}
