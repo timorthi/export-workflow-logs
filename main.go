@@ -58,7 +58,7 @@ func main() {
 	if strings.EqualFold(actionInputs.destination, AmazonS3Destination) {
 		log.Debug().Msg("Attempting to upload workflow logs to S3")
 		s3Client, err := s3Client(ctx, AWSConfig{
-			accessKeyId:     actionInputs.s3Inputs.awsAccessKeyID,
+			accessKeyID:     actionInputs.s3Inputs.awsAccessKeyID,
 			secretAccessKey: actionInputs.s3Inputs.awsSecretAccessKey,
 			region:          actionInputs.s3Inputs.awsRegion,
 		})

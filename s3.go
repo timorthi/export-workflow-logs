@@ -16,13 +16,13 @@ type S3PutObjectAPI interface {
 
 // AWSConfig is a struct containing the AWS credentials and config needed to initialize the SDK client
 type AWSConfig struct {
-	accessKeyId     string
+	accessKeyID     string
 	secretAccessKey string
 	region          string
 }
 
 func s3Client(ctx context.Context, cfg AWSConfig) (*s3.Client, error) {
-	os.Setenv("AWS_ACCESS_KEY_ID", cfg.accessKeyId)
+	os.Setenv("AWS_ACCESS_KEY_ID", cfg.accessKeyID)
 	os.Setenv("AWS_SECRET_ACCESS_KEY", cfg.secretAccessKey)
 
 	awsConfig, err := config.LoadDefaultConfig(ctx, config.WithRegion(cfg.region))
