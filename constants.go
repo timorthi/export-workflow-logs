@@ -36,11 +36,11 @@ const (
 
 // Misc constants
 const (
-	AmazonS3Destination         string = "s3"
-	AzureBlobStorageDestination string = "blobstorage"
+	amazonS3Destination         string = "s3"
+	azureBlobStorageDestination string = "blobstorage"
 	githubDefaultBaseURL        string = "https://github.com"
 )
 
 var (
-	supportedDestinations = []string{AmazonS3Destination, AzureBlobStorageDestination}
+	supportedDestinations = []string{amazonS3Destination, azureBlobStorageDestination}
 )

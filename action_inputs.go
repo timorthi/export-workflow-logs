@@ -83,7 +83,7 @@ func validateActionInputs() (ActionInputs, error) {
 	var s3Inputs *S3ActionInputs
 	var blobStorageInputs *BlobStorageActionInputs
 
-	if matchedDestination == AmazonS3Destination {
+	if matchedDestination == amazonS3Destination {
 		log.Debug().Msg("Validating Action inputs for S3")
 		s3Inputs = &S3ActionInputs{
 			awsAccessKeyID:     *inputAWSAccessKeyID,
@@ -101,7 +101,7 @@ func validateActionInputs() (ActionInputs, error) {
 		}
 	}
 
-	if matchedDestination == AzureBlobStorageDestination {
+	if matchedDestination == azureBlobStorageDestination {
 		log.Debug().Msg("Validating Action inputs for Blob Storage")
 		blobStorageInputs = &BlobStorageActionInputs{
 			storageAccountName: *inputAzureStorageAccountName,

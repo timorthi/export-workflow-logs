@@ -55,7 +55,7 @@ func main() {
 	log.Info().Int64("workflowRunID", actionInputs.workflowRunID).Str("url", workflowRunLogsURLStr).
 		Msg("Successfully fetched workflow run logs")
 
-	if strings.EqualFold(actionInputs.destination, AmazonS3Destination) {
+	if strings.EqualFold(actionInputs.destination, amazonS3Destination) {
 		log.Debug().Msg("Attempting to upload workflow logs to S3")
 		s3Client, err := s3Client(ctx, AWSConfig{
 			accessKeyID:     actionInputs.s3Inputs.awsAccessKeyID,
@@ -78,7 +78,7 @@ func main() {
 		return
 	}
 
-	if strings.EqualFold(actionInputs.destination, AzureBlobStorageDestination) {
+	if strings.EqualFold(actionInputs.destination, azureBlobStorageDestination) {
 		log.Debug().Msg("Attempting to upload workflow logs to Blob Storage")
 		blobStorageClient, err := blobStorageClient(AzureStorageConfig{
 			storageAccountName: actionInputs.blobStorageInputs.storageAccountName,
