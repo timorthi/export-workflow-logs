@@ -23,11 +23,11 @@ func githubClient(ctx context.Context, accessToken string) (*github.Client, erro
 
 	if serverURL != githubDefaultBaseURL {
 		log.Debug().Str("serverURL", serverURL).
-			Msgf("Detected a non-default GITHUB_SERVER_URL value. Using GitHub Enterprise Client.")
+			Msg("Detected a non-default GITHUB_SERVER_URL value. Using GitHub Enterprise Client")
 		return github.NewEnterpriseClient(serverURL, serverURL, tc)
 	}
 
-	log.Debug().Msg("Using regular GitHub client.")
+	log.Debug().Msg("Using regular GitHub client")
 	return github.NewClient(tc), nil
 }
 
