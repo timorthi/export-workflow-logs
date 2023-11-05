@@ -2,7 +2,7 @@
 FROM golang:1.19 AS builder
 
 # Install upx to compress the binary
-RUN apt-get update && apt-get -y install upx
+RUN apt-get update && apt-get -y install upx-ucl
 
 ENV CGO_ENABLED=0
 
