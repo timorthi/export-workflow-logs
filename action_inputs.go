@@ -16,10 +16,11 @@ var (
 	inputDestination   *string = flag.String(inputKeyDestination, "", "The service to export workflow logs to")
 )
 
-// Required inputs for S3
+// Inputs for S3
 var (
 	inputAWSAccessKeyID     *string = flag.String(inputKeyAWSAccessKeyID, "", "AWS Access Key ID")
 	inputAWSSecretAccessKey *string = flag.String(inputKeyAWSSecretAccessKey, "", "AWS Secret Access Key")
+	inputAWSSessionToken    *string = flag.String(inputKeyAWSSessionToken, "", "AWS Session Token for temporary credentials")
 	inputAWSRegion          *string = flag.String(inputKeyAWSRegion, "us-east-1", "AWS Region for the S3 bucket")
 	inputS3BucketName       *string = flag.String(inputKeyS3BucketName, "", "S3 bucket name")
 	inputS3Key              *string = flag.String(inputKeyS3Key, "", "S3 key")
@@ -33,10 +34,11 @@ var (
 	inputBlobName                *string = flag.String(inputKeyBlobName, "", "Azure blob name")
 )
 
-// S3ActionInputs contains inputs required for the `s3` destination
+// S3ActionInputs contains inputs used for the `s3` destination
 type S3ActionInputs struct {
 	awsAccessKeyID     string
 	awsSecretAccessKey string
+	awsSessionToken    string // optional
 	awsRegion          string
 	bucketName         string
 	key                string
@@ -88,6 +90,7 @@ func validateActionInputs() (ActionInputs, error) {
 		s3Inputs = &S3ActionInputs{
 			awsAccessKeyID:     *inputAWSAccessKeyID,
 			awsSecretAccessKey: *inputAWSSecretAccessKey,
+			awsSessionToken:    *inputAWSSessionToken, // optional
 			awsRegion:          *inputAWSRegion,
 			bucketName:         *inputS3BucketName,
 			key:                *inputS3Key,
