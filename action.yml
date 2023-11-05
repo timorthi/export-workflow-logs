@@ -16,9 +16,9 @@ inputs:
     description: "The service to export workflow logs to"
     required: true
   aws-access-key-id:
-    description: "AWS Access Key ID. Required if destination is 's3' and if using long-term credentials."
+    description: "AWS Access Key ID. Required if destination is 's3'."
   aws-secret-access-key:
-    description: "AWS Secret Access Key. Required if destination is 's3' and if using long-term credentials."
+    description: "AWS Secret Access Key. Required if destination is 's3'."
   aws-session-token:
     description: "AWS Session Token. Required if destination is 's3' and if using temporary credentials."
   aws-region:
