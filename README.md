@@ -34,14 +34,29 @@ on:
 jobs:
   export-hello-world-logs:
     runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write # required for authenticating with AWS using OIDC
+      actions: read # required for export-workflow-logs to retrieve workflow logs
+
     steps:
+      # Reference: https://github.com/aws-actions/configure-aws-credentials/tree/main#retrieving-credentials-from-step-output-assumerole-with-temporary-credentials
+      - name: Configure AWS Credentials
+        id: configure_aws
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::12345678:role/ExportWorkflowLogsRole
+          aws-region: us-west-1
+          output-credentials: true
+
       - uses: timorthi/export-workflow-logs@v1
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           run-id: ${{ github.event.workflow_run.id }}
           destination: s3
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets. AWS_SECRET_ACCESS_KEY }}
+          aws-access-key-id: ${{ steps.configure_aws.outputs.aws-access-key-id }}
+          aws-secret-access-key: ${{ steps.configure_aws.outputs.aws-secret-access-key }}
+          aws-session-token: ${{ steps.configure_aws.outputs.aws-session-token }}
           aws-region: us-west-1
           s3-bucket-name: my-workflow-logs
           # https://docs.github.com/developers/webhooks-and-events/webhooks/webhook-events-and-payloads?actionType=requested#workflow_run
@@ -105,16 +120,14 @@ To test changes in a GitHub Action, change `action.yml` to point to the Dockerfi
 runs:
   using: "docker"
   image: "Dockerfile"
-  args:
-    ...
+  args: ...
 ```
 
 Then, make sure the GitHub Actions workflow that calls this Action references the branch or commit in which you made this change.
 
 ```yml
 - uses: timorthi/export-workflow-logs@my-feature-branch-1
-  with:
-    ...
+  with: ...
 ```
 
 This will force the workflow to build the image (and therefore the Go source code) on every run.
