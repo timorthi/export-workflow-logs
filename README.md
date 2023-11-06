@@ -61,10 +61,10 @@ This Action only supports one environment variable: set `DEBUG` to `true` to ena
 
 The following inputs are required regardless of the chosen destination:
 
-| Name | Description |
-| - | - |
-| `repo-token` | Token to use to fetch workflow logs. Typically the `GITHUB_TOKEN` secret. |
-| `run-id` | The workflow run ID for which to export logs. Typically obtained via the `github` context per the above example. |
+| Name          | Description                                                                                                        |
+| ------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `repo-token`  | Token to use to fetch workflow logs. Typically the `GITHUB_TOKEN` secret.                                          |
+| `run-id`      | The workflow run ID for which to export logs. Typically obtained via the `github` context per the above example.   |
 | `destination` | The service to export workflow logs to. Supported values: [`s3`](#amazon-s3), [`blobstorage`](#azure-blob-storage) |
 
 ### [Amazon S3](https://aws.amazon.com/s3/)
