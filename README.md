@@ -76,6 +76,7 @@ The following inputs are required if `destination` is `s3`:
 | - | - |
 | `aws-access-key-id` | Access Key ID to use to upload workflow logs to S3 |
 | `aws-secret-access-key` | Secret Access Key to use to upload workflow logs to S3 |
+| `aws-session-token` (Optional) | Session token to use to upload workflow logs to S3. Required only if authenticating with temporary credentials. |
 | `aws-region` | Region of the S3 bucket to upload to. Example: `us-east-1`
 | `s3-bucket-name` | Name of the S3 bucket to upload to
 | `s3-key` | S3 key to save the workflow logs to
