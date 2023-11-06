@@ -21,6 +21,7 @@ const (
 const (
 	inputKeyAWSAccessKeyID     string = "aws-access-key-id"
 	inputKeyAWSSecretAccessKey string = "aws-secret-access-key"
+	inputKeyAWSSessionToken    string = "aws-session-token"
 	inputKeyAWSRegion          string = "aws-region"
 	inputKeyS3BucketName       string = "s3-bucket-name"
 	inputKeyS3Key              string = "s3-key"

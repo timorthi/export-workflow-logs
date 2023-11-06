@@ -57,6 +57,34 @@ func TestValidateActionInputs(t *testing.T) {
 			wantError: "",
 		},
 		{
+			desc:          "S3 destination success case with session token",
+			shouldSucceed: true,
+			inputValuesByKey: map[string]string{
+				inputKeyDestination:        "s3",
+				inputKeyAWSAccessKeyID:     "abc",
+				inputKeyAWSSecretAccessKey: "bcd",
+				inputKeyAWSSessionToken:    "cde",
+				inputKeyAWSRegion:          "someregion",
+				inputKeyS3BucketName:       "my-bucket",
+				inputKeyS3Key:              "some/key",
+			},
+			wantResult: ActionInputs{
+				repoToken:         "testRepoToken",
+				workflowRunID:     123,
+				destination:       "s3",
+				blobStorageInputs: nil,
+				s3Inputs: &S3ActionInputs{
+					awsAccessKeyID:     "abc",
+					awsSecretAccessKey: "bcd",
+					awsSessionToken:    "cde",
+					awsRegion:          "someregion",
+					bucketName:         "my-bucket",
+					key:                "some/key",
+				},
+			},
+			wantError: "",
+		},
+		{
 			desc:          "S3 destination failure case",
 			shouldSucceed: false,
 			inputValuesByKey: map[string]string{

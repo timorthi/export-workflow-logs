@@ -1,8 +1,9 @@
 # https://www.sethvargo.com/writing-github-actions-in-go/
-FROM golang:1.19 AS builder
+FROM golang:1.19-buster AS builder
 
 # Install upx to compress the binary
-RUN apt-get update && apt-get -y install upx
+# https://packages.debian.org/buster/utils/upx-ucl
+RUN apt-get update && apt-get -y install upx-ucl
 
 ENV CGO_ENABLED=0
 

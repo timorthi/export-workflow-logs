@@ -18,12 +18,16 @@ type S3PutObjectAPI interface {
 type AWSConfig struct {
 	accessKeyID     string
 	secretAccessKey string
+	sessionToken    string
 	region          string
 }
 
 func s3Client(ctx context.Context, cfg AWSConfig) (*s3.Client, error) {
 	os.Setenv("AWS_ACCESS_KEY_ID", cfg.accessKeyID)
 	os.Setenv("AWS_SECRET_ACCESS_KEY", cfg.secretAccessKey)
+	if len(cfg.sessionToken) > 0 {
+		os.Setenv("AWS_SESSION_TOKEN", cfg.sessionToken)
+	}
 
 	awsConfig, err := config.LoadDefaultConfig(ctx, config.WithRegion(cfg.region))
 	if err != nil {

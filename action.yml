@@ -19,6 +19,8 @@ inputs:
     description: "AWS Access Key ID. Required if destination is 's3'."
   aws-secret-access-key:
     description: "AWS Secret Access Key. Required if destination is 's3'."
+  aws-session-token:
+    description: "AWS Session Token. Required if destination is 's3' and if using temporary credentials."
   aws-region:
     description: "AWS Region in which the S3 bucket is located. Required if destination is 's3'."
   s3-bucket-name:
@@ -43,6 +45,7 @@ runs:
     - --destination=${{ inputs.destination }}
     - --aws-access-key-id=${{ inputs.aws-access-key-id }}
     - --aws-secret-access-key=${{ inputs.aws-secret-access-key }}
+    - --aws-session-token=${{ inputs.aws-session-token }}
     - --aws-region=${{ inputs.aws-region }}
     - --s3-bucket-name=${{ inputs.s3-bucket-name }}
     - --s3-key=${{ inputs.s3-key }}
