@@ -31,6 +31,7 @@ on:
   workflow_run:
     workflows: [Hello World]
     types: [completed]
+
 jobs:
   export-hello-world-logs:
     runs-on: ubuntu-latest
