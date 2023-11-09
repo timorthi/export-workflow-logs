@@ -60,6 +60,7 @@ func main() {
 		s3Client, err := s3Client(ctx, AWSConfig{
 			accessKeyID:     actionInputs.s3Inputs.awsAccessKeyID,
 			secretAccessKey: actionInputs.s3Inputs.awsSecretAccessKey,
+			sessionToken:    actionInputs.s3Inputs.awsSessionToken,
 			region:          actionInputs.s3Inputs.awsRegion,
 		})
 		if err != nil {

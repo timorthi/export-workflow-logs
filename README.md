@@ -31,17 +31,33 @@ on:
   workflow_run:
     workflows: [Hello World]
     types: [completed]
+
 jobs:
   export-hello-world-logs:
     runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write # required for authenticating with AWS using OIDC
+      actions: read # required for export-workflow-logs to retrieve workflow logs
+
     steps:
+      # Reference: https://github.com/aws-actions/configure-aws-credentials/tree/main#retrieving-credentials-from-step-output-assumerole-with-temporary-credentials
+      - name: Configure AWS Credentials
+        id: configure_aws
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::12345678:role/ExportWorkflowLogsRole
+          aws-region: us-west-1
+          output-credentials: true
+
       - uses: timorthi/export-workflow-logs@v1
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           run-id: ${{ github.event.workflow_run.id }}
           destination: s3
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets. AWS_SECRET_ACCESS_KEY }}
+          aws-access-key-id: ${{ steps.configure_aws.outputs.aws-access-key-id }}
+          aws-secret-access-key: ${{ steps.configure_aws.outputs.aws-secret-access-key }}
+          aws-session-token: ${{ steps.configure_aws.outputs.aws-session-token }}
           aws-region: us-west-1
           s3-bucket-name: my-workflow-logs
           # https://docs.github.com/developers/webhooks-and-events/webhooks/webhook-events-and-payloads?actionType=requested#workflow_run
@@ -51,7 +67,7 @@ jobs:
 
 ## Usage
 
-Workflow run logs can only be downloaded on completion of that workflow. To export workflow logs, you will have to run this action in a separate workflow that runs after the conclusion of an upstream workflow (see the [`workflow_run`](https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#workflow_run) event). Attempting to export the workflow run logs of an in-progress workflow will result in a 404 error from the GitHub API.
+Workflow run logs can only be downloaded on completion of that workflow. To export workflow logs, you will have to run this action in a separate workflow that runs after the conclusion of an upstream workflow. This is achieved via the [`workflow_run`](https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#workflow_run) event. Attempting to export the workflow run logs of an in-progress workflow will result in a 404 error from the GitHub API.
 
 ### Environment Variables
 
@@ -61,10 +77,10 @@ This Action only supports one environment variable: set `DEBUG` to `true` to ena
 
 The following inputs are required regardless of the chosen destination:
 
-| Name | Description |
-| - | - |
-| `repo-token` | Token to use to fetch workflow logs. Typically the `GITHUB_TOKEN` secret. |
-| `run-id` | The workflow run ID for which to export logs. Typically obtained via the `github` context per the above example. |
+| Name          | Description                                                                                                        |
+| ------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `repo-token`  | Token to use to fetch workflow logs. Typically the `GITHUB_TOKEN` secret.                                          |
+| `run-id`      | The workflow run ID for which to export logs. Typically obtained via the `github` context per the above example.   |
 | `destination` | The service to export workflow logs to. Supported values: [`s3`](#amazon-s3), [`blobstorage`](#azure-blob-storage) |
 
 ### [Amazon S3](https://aws.amazon.com/s3/)
@@ -72,25 +88,28 @@ The following inputs are required regardless of the chosen destination:
 The S3 exporter uses the `S3PutObject` API to save the workflow logs file.
 
 The following inputs are required if `destination` is `s3`:
-| Name | Description |
-| - | - |
-| `aws-access-key-id` | Access Key ID to use to upload workflow logs to S3 |
-| `aws-secret-access-key` | Secret Access Key to use to upload workflow logs to S3 |
-| `aws-region` | Region of the S3 bucket to upload to. Example: `us-east-1`
-| `s3-bucket-name` | Name of the S3 bucket to upload to
-| `s3-key` | S3 key to save the workflow logs to
+
+| Name                           | Description                                                                                                     |
+| ------------------------------ | --------------------------------------------------------------------------------------------------------------- |
+| `aws-access-key-id`            | Access Key ID to use to upload workflow logs to S3                                                              |
+| `aws-secret-access-key`        | Secret Access Key to use to upload workflow logs to S3                                                          |
+| `aws-session-token` (Optional) | Session token to use to upload workflow logs to S3. Required only if authenticating with temporary credentials. |
+| `aws-region`                   | Region of the S3 bucket to upload to. Example: `us-east-1`                                                      |
+| `s3-bucket-name`               | Name of the S3 bucket to upload to                                                                              |
+| `s3-key`                       | S3 key to save the workflow logs to                                                                             |
 
 ### [Azure Blob Storage](https://azure.microsoft.com/en-us/products/storage/blobs/)
 
 The Blob Storage exporter uses the `UploadBuffer` API to save the workflow logs file.
 
 The following inputs are required if `destination` is `blobstorage`:
-| Name | Description |
-| - | - |
-| `azure-storage-account-name` | Azure Storage Account name |
-| `azure-storage-account-key` | Access key for the Storage Account |
-| `container-name` | The name of the Blob Storage Container to upload to |
-| `blob-name` | Blob name to save the workflow logs as |
+
+| Name                         | Description                                         |
+| ---------------------------- | --------------------------------------------------- |
+| `azure-storage-account-name` | Azure Storage Account name                          |
+| `azure-storage-account-key`  | Access key for the Storage Account                  |
+| `container-name`             | The name of the Blob Storage Container to upload to |
+| `blob-name`                  | Blob name to save the workflow logs as              |
 
 ## Development
 
@@ -104,16 +123,14 @@ To test changes in a GitHub Action, change `action.yml` to point to the Dockerfi
 runs:
   using: "docker"
   image: "Dockerfile"
-  args:
-    ...
+  args: ...
 ```
 
 Then, make sure the GitHub Actions workflow that calls this Action references the branch or commit in which you made this change.
 
 ```yml
 - uses: timorthi/export-workflow-logs@my-feature-branch-1
-  with:
-    ...
+  with: ...
 ```
 
 This will force the workflow to build the image (and therefore the Go source code) on every run.
