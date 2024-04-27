@@ -35,13 +35,20 @@ const (
 	inputKeyBlobName                string = "blob-name"
 )
 
+// Google Cloud Storage Action Inputs
+const (
+	inputKeyCloudStorageBucketName string = "cloud-storage-bucket-name"
+	inputKeyCloudStorageObjectName string = "cloud-storage-object-name"
+)
+
 // Misc constants
 const (
-	amazonS3Destination         string = "s3"
-	azureBlobStorageDestination string = "blobstorage"
-	githubDefaultBaseURL        string = "https://github.com"
+	amazonS3Destination           string = "s3"
+	azureBlobStorageDestination   string = "blobstorage"
+	googleCloudStorageDestination string = "cloudstorage"
+	githubDefaultBaseURL          string = "https://github.com"
 )
 
 var (
-	supportedDestinations = []string{amazonS3Destination, azureBlobStorageDestination}
+	supportedDestinations = []string{amazonS3Destination, azureBlobStorageDestination, googleCloudStorageDestination}
 )
