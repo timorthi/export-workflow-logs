@@ -16,7 +16,7 @@ type CreateObjectParams struct {
 }
 
 // saveToCloudStorage creates an object in Google Cloud Storage
-func saveToCloudStorage(ctx context.Context, client storage.Client, createObjectParams CreateObjectParams) error {
+func saveToCloudStorage(ctx context.Context, client *storage.Client, createObjectParams CreateObjectParams) error {
 	bucket := client.Bucket(createObjectParams.BucketName)
 	object := bucket.Object(createObjectParams.ObjectName)
 	writer := object.NewWriter(ctx)
