@@ -8,6 +8,14 @@ import (
 	"cloud.google.com/go/storage"
 )
 
+func cloudStorageClient(ctx context.Context) (*storage.Client, error) {
+	client, err := storage.NewClient(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return client, nil
+}
+
 // CreateObjectParams contains the required params to make an UploadBuffer call
 type CreateObjectParams struct {
 	BucketName string
