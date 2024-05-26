@@ -113,6 +113,8 @@ The following inputs are required if `destination` is `blobstorage`:
 
 ### [Google Cloud Storage](https://cloud.google.com/storage/)
 
+[Example](examples/google-cloud-storage/)
+
 The Cloud Storage exporter uses the Object Writer API to save the workflow logs file.
 
 The following inputs are required if `destination` is `cloudstorage`:
@@ -121,8 +123,6 @@ The following inputs are required if `destination` is `cloudstorage`:
 | --------------------------- | -------------------------------------------------------- |
 | `cloud-storage-bucket-name` | The name of the Google Cloud Storage bucket to upload to |
 | `cloud-storage-object-name` | Object name to save the workflow logs as                 |
-
-[Google Cloud Storage example](examples/google-cloud-storage/)
 
 ## Development
 
