@@ -16,7 +16,7 @@ func cloudStorageClient(ctx context.Context) (*storage.Client, error) {
 	return client, nil
 }
 
-// CreateObjectParams contains the required params to make an UploadBuffer call
+// CreateObjectParams contains the required params to write an object to a Cloud Storage bucket
 type CreateObjectParams struct {
 	BucketName string
 	ObjectName string
