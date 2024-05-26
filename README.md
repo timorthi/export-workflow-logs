@@ -117,10 +117,10 @@ The Cloud Storage exporter uses the Object Writer API to save the workflow logs 
 
 The following inputs are required if `destination` is `cloudstorage`:
 
-| Name          | Description                                              |
-| ------------- | -------------------------------------------------------- |
-| `bucket-name` | The name of the Google Cloud Storage bucket to upload to |
-| `object-name` | Object name to save the workflow logs as                 |
+| Name                        | Description                                              |
+| --------------------------- | -------------------------------------------------------- |
+| `cloud-storage-bucket-name` | The name of the Google Cloud Storage bucket to upload to |
+| `cloud-storage-object-name` | Object name to save the workflow logs as                 |
 
 ## Development
 
