@@ -35,6 +35,10 @@ inputs:
     description: "Container name to save the workflow logs to. Required if destination is 'blobstorage'."
   blob-name:
     description: "Blob name to save the workflow logs as. Required if destination is 'blobstorage'."
+  cloud-storage-bucket-name:
+    description: "Cloud Storage Bucket name to save the workflow logs to. Required if destination is 'cloudstorage'."
+  cloud-storage-object-name:
+    description: "Cloud Storage object name to save the workflow logs as. Required if destination is 'cloudstorage'."
 
 runs:
   using: "docker"
@@ -53,3 +57,5 @@ runs:
     - --azure-storage-account-key=${{ inputs.azure-storage-account-key }}
     - --container-name=${{ inputs.container-name }}
     - --blob-name=${{ inputs.blob-name }}
+    - --cloud-storage-bucket-name=${{ inputs.cloud-storage-bucket-name }}
+    - --cloud-storage-object-name=${{ inputs.cloud-storage-object-name }}

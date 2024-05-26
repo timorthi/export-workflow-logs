@@ -135,6 +135,38 @@ func TestValidateActionInputs(t *testing.T) {
 			wantResult: ActionInputs{},
 			wantError:  fmt.Sprintf("the following inputs are required: %s", inputKeyAzureStorageAccountKey),
 		},
+		{
+			desc:          "Cloud Storage destination success case",
+			shouldSucceed: true,
+			inputValuesByKey: map[string]string{
+				inputKeyDestination:            "cloudstorage",
+				inputKeyCloudStorageBucketName: "bucket999",
+				inputKeyCloudStorageObjectName: "object222",
+			},
+			wantResult: ActionInputs{
+				repoToken:         "testRepoToken",
+				workflowRunID:     123,
+				destination:       "cloudstorage",
+				s3Inputs:          nil,
+				blobStorageInputs: nil,
+				cloudStorageInputs: &CloudStorageActionInputs{
+					bucketName: "bucket999",
+					objectName: "object222",
+				},
+			},
+			wantError: "",
+		},
+		{
+			desc:          "Cloud Storage destination failure case",
+			shouldSucceed: false,
+			inputValuesByKey: map[string]string{
+				inputKeyDestination:            "cloudstorage",
+				inputKeyCloudStorageBucketName: "bucket999",
+				// inputKeyCloudStorageObjectName intentionally excluded
+			},
+			wantResult: ActionInputs{},
+			wantError:  fmt.Sprintf("the following inputs are required: %s", inputKeyCloudStorageObjectName),
+		},
 	}
 
 	for _, tC := range testCases {

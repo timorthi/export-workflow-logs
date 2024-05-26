@@ -34,6 +34,12 @@ var (
 	inputBlobName                *string = flag.String(inputKeyBlobName, "", "Azure blob name")
 )
 
+// Inputs for Google Cloud Storage
+var (
+	inputCloudStorageBucketName *string = flag.String(inputKeyCloudStorageBucketName, "", "Google Cloud Storage bucket name")
+	inputCloudStorageObjectName *string = flag.String(inputKeyCloudStorageObjectName, "", "Google Cloud Storage object name")
+)
+
 // S3ActionInputs contains inputs used for the `s3` destination
 type S3ActionInputs struct {
 	awsAccessKeyID     string
@@ -52,14 +58,21 @@ type BlobStorageActionInputs struct {
 	blobName           string
 }
 
+// CloudStorageActionInputs contains inputs required for the `cloudstorage` destination
+type CloudStorageActionInputs struct {
+	bucketName string
+	objectName string
+}
+
 // ActionInputs contains all the pertinent inputs for this GitHub Action. For a given destination, its corresponding
 // struct field (e.g. s3Inputs for the `s3` destination) is assumed to be non-nil.
 type ActionInputs struct {
-	repoToken         string
-	workflowRunID     int64
-	destination       string
-	s3Inputs          *S3ActionInputs
-	blobStorageInputs *BlobStorageActionInputs
+	repoToken          string
+	workflowRunID      int64
+	destination        string
+	s3Inputs           *S3ActionInputs
+	blobStorageInputs  *BlobStorageActionInputs
+	cloudStorageInputs *CloudStorageActionInputs
 }
 
 // validateActionInputs validates input combinations that cannot be checked at the action-level.
@@ -84,6 +97,7 @@ func validateActionInputs() (ActionInputs, error) {
 	var inputFlagsToAssertNotEmpty map[string]string
 	var s3Inputs *S3ActionInputs
 	var blobStorageInputs *BlobStorageActionInputs
+	var cloudStorageInputs *CloudStorageActionInputs
 
 	if matchedDestination == amazonS3Destination {
 		log.Debug().Msg("Validating Action inputs for S3")
@@ -120,6 +134,18 @@ func validateActionInputs() (ActionInputs, error) {
 		}
 	}
 
+	if matchedDestination == googleCloudStorageDestination {
+		log.Debug().Msg("Validating Action inputs for Cloud Storage")
+		cloudStorageInputs = &CloudStorageActionInputs{
+			bucketName: *inputCloudStorageBucketName,
+			objectName: *inputCloudStorageObjectName,
+		}
+		inputFlagsToAssertNotEmpty = map[string]string{
+			inputKeyCloudStorageBucketName: *inputCloudStorageBucketName,
+			inputKeyCloudStorageObjectName: *inputCloudStorageObjectName,
+		}
+	}
+
 	var emptyInputs []string
 	for inputName, inputValue := range inputFlagsToAssertNotEmpty {
 		if len(inputValue) == 0 {
@@ -133,10 +159,11 @@ func validateActionInputs() (ActionInputs, error) {
 
 	log.Debug().Msg("Action input validation was successful")
 	return ActionInputs{
-		repoToken:         *inputRepoToken,
-		workflowRunID:     *inputWorkflowRunID,
-		destination:       matchedDestination,
-		s3Inputs:          s3Inputs,
-		blobStorageInputs: blobStorageInputs,
+		repoToken:          *inputRepoToken,
+		workflowRunID:      *inputWorkflowRunID,
+		destination:        matchedDestination,
+		s3Inputs:           s3Inputs,
+		blobStorageInputs:  blobStorageInputs,
+		cloudStorageInputs: cloudStorageInputs,
 	}, nil
 }
