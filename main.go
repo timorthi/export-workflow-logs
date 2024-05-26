@@ -101,4 +101,24 @@ func main() {
 			Msg("Successfully saved workflow run logs to Blob Storage")
 		return
 	}
+
+	if strings.EqualFold(actionInputs.destination, googleCloudStorageDestination) {
+		log.Debug().Msg("Attempting to upload workflow logs to Google Cloud Storage")
+		cloudStorageClient, err := cloudStorageClient(ctx)
+		if err != nil {
+			log.Fatal().Err(err).Msg("Error initializing Cloud Storage client")
+		}
+		err = saveToCloudStorage(ctx, cloudStorageClient, CreateObjectParams{
+			BucketName: actionInputs.cloudStorageInputs.bucketName,
+			ObjectName: actionInputs.cloudStorageInputs.objectName,
+			Contents:   workflowRunLogs,
+		})
+		if err != nil {
+			log.Fatal().Err(err).Msg("Error uploading workflow logs to Cloud Storage")
+		}
+		log.Info().Str("bucketName", actionInputs.cloudStorageInputs.bucketName).
+			Str("objectName", actionInputs.cloudStorageInputs.objectName).
+			Msg("Successfully saved workflow run logs to Cloud Storage")
+		return
+	}
 }
