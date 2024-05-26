@@ -122,6 +122,8 @@ The following inputs are required if `destination` is `cloudstorage`:
 | `cloud-storage-bucket-name` | The name of the Google Cloud Storage bucket to upload to |
 | `cloud-storage-object-name` | Object name to save the workflow logs as                 |
 
+[Google Cloud Storage example](examples/google-cloud-storage/)
+
 ## Development
 
 ### Testing
