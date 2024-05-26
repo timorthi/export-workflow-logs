@@ -2,7 +2,7 @@
 
 [![Maintainability](https://api.codeclimate.com/v1/badges/adf5dcf95b53da6c741f/maintainability)](https://codeclimate.com/github/timorthi/export-workflow-logs/maintainability) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-`export-workflow-logs` is a GitHub Action to automatically export the logs of a GitHub Actions Workflow run to popular cloud storage solutions like Amazon S3 and Azure Blob Storage.
+`export-workflow-logs` is a GitHub Action to automatically export the logs of a GitHub Actions Workflow run to popular cloud storage solutions like Amazon S3, Azure Blob Storage, and Google Cloud Storage.
 
 The logs for workflow run are only [available for a limited time](https://docs.github.com/en/organizations/managing-organization-settings/configuring-the-retention-period-for-github-actions-artifacts-and-logs-in-your-organization) before they are automatically deleted. This Action moves workflow run logs to longer term storage to make them easily accessible in the future for auditing purposes.
 
@@ -77,11 +77,11 @@ This Action only supports one environment variable: set `DEBUG` to `true` to ena
 
 The following inputs are required regardless of the chosen destination:
 
-| Name          | Description                                                                                                        |
-| ------------- | ------------------------------------------------------------------------------------------------------------------ |
-| `repo-token`  | Token to use to fetch workflow logs. Typically the `GITHUB_TOKEN` secret.                                          |
-| `run-id`      | The workflow run ID for which to export logs. Typically obtained via the `github` context per the above example.   |
-| `destination` | The service to export workflow logs to. Supported values: [`s3`](#amazon-s3), [`blobstorage`](#azure-blob-storage) |
+| Name          | Description                                                                                                                                                 |
+| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `repo-token`  | Token to use to fetch workflow logs. Typically the `GITHUB_TOKEN` secret.                                                                                   |
+| `run-id`      | The workflow run ID for which to export logs. Typically obtained via the `github` context per the above example.                                            |
+| `destination` | The service to export workflow logs to. Supported values: [`s3`](#amazon-s3), [`blobstorage`](#azure-blob-storage), [`cloudstorage`](#google-cloud-storage) |
 
 ### [Amazon S3](https://aws.amazon.com/s3/)
 
@@ -110,6 +110,19 @@ The following inputs are required if `destination` is `blobstorage`:
 | `azure-storage-account-key`  | Access key for the Storage Account                  |
 | `container-name`             | The name of the Blob Storage Container to upload to |
 | `blob-name`                  | Blob name to save the workflow logs as              |
+
+### [Google Cloud Storage](https://cloud.google.com/storage/)
+
+[Example](examples/google-cloud-storage/)
+
+The Cloud Storage exporter uses the Object Writer API to save the workflow logs file.
+
+The following inputs are required if `destination` is `cloudstorage`:
+
+| Name                        | Description                                              |
+| --------------------------- | -------------------------------------------------------- |
+| `cloud-storage-bucket-name` | The name of the Google Cloud Storage bucket to upload to |
+| `cloud-storage-object-name` | Object name to save the workflow logs as                 |
 
 ## Development
 

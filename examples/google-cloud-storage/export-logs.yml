@@ -1,0 +1,29 @@
+name: Export To Google Cloud Storage
+on:
+  workflow_run:
+    workflows: [Hello World]
+    types: [completed]
+jobs:
+  export-hello-world-logs:
+    permissions:
+      contents: "read"
+      id-token: "write"
+      actions: "read"
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: "actions/checkout@v4"
+
+      - uses: "google-github-actions/auth@v2"
+        with:
+          project_id: "foo-project"
+          service_account: "srv-gh-logs-exporter@foo-project.iam.gserviceaccount.com"
+          workload_identity_provider: "projects/1234567/locations/global/workloadIdentityPools/foo/providers/bar"
+
+      - uses: timorthi/export-workflow-logs@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.workflow_run.id }}
+          destination: cloudstorage
+          cloud-storage-bucket-name: foo-workflow-logs
+          cloud-storage-object-name: ${{ github.event.workflow_run.name }}/${{ github.event.workflow_run.created_at }}-runId${{ github.event.workflow_run.id }}.zip
